@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types';
 import { z } from 'zod';
+import { isVideoUrl } from '@/lib/mediaUtils';
 
 const productSchema = z.object({
   name: z.string().min(2, 'اسم المنتج مطلوب'),
@@ -88,11 +89,17 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
       setImageFiles((prev) => [...prev, ...files]);
       
       files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImagePreviews((prev) => [...prev, reader.result as string]);
-        };
-        reader.readAsDataURL(file);
+        // For videos, use URL.createObjectURL instead of FileReader
+        if (file.type.startsWith('video/')) {
+          const videoUrl = URL.createObjectURL(file);
+          setImagePreviews((prev) => [...prev, videoUrl]);
+        } else {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setImagePreviews((prev) => [...prev, reader.result as string]);
+          };
+          reader.readAsDataURL(file);
+        }
       });
     }
   };
@@ -247,20 +254,28 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              {/* Multi-Image Upload */}
+              {/* Multi-Image/Video Upload */}
               <div>
-                <label className="block text-sm font-medium mb-2">صور المنتج (يمكن رفع عدة صور)</label>
+                <label className="block text-sm font-medium mb-2">صور وفيديوهات المنتج</label>
                 <div className="border-2 border-dashed border-border rounded-lg p-4">
                   {allPreviews.length > 0 ? (
                     <div className="space-y-4">
                       <div className="grid grid-cols-4 gap-3">
                         {existingImages.map((img, index) => (
                           <div key={`existing-${index}`} className="relative aspect-square">
-                            <img
-                              src={img}
-                              alt={`Image ${index + 1}`}
-                              className={`w-full h-full object-cover rounded-lg ${index === 0 ? 'ring-2 ring-primary' : ''}`}
-                            />
+                            {isVideoUrl(img) ? (
+                              <video
+                                src={img}
+                                className={`w-full h-full object-cover rounded-lg ${index === 0 ? 'ring-2 ring-primary' : ''}`}
+                                muted
+                              />
+                            ) : (
+                              <img
+                                src={img}
+                                alt={`Image ${index + 1}`}
+                                className={`w-full h-full object-cover rounded-lg ${index === 0 ? 'ring-2 ring-primary' : ''}`}
+                              />
+                            )}
                             <button
                               type="button"
                               onClick={() => removeExistingImage(index)}
@@ -275,33 +290,45 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
                             )}
                           </div>
                         ))}
-                        {imagePreviews.map((img, index) => (
-                          <div key={`new-${index}`} className="relative aspect-square">
-                            <img
-                              src={img}
-                              alt={`New Image ${index + 1}`}
-                              className={`w-full h-full object-cover rounded-lg ${existingImages.length === 0 && index === 0 ? 'ring-2 ring-primary' : ''}`}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeNewImage(index)}
-                              className="absolute -top-2 -left-2 bg-destructive text-destructive-foreground p-1 rounded-full"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                            {existingImages.length === 0 && index === 0 && (
-                              <span className="absolute bottom-1 right-1 bg-primary text-primary-foreground text-xs px-1 rounded">
-                                رئيسية
-                              </span>
-                            )}
-                          </div>
-                        ))}
+                        {imagePreviews.map((preview, index) => {
+                          const file = imageFiles[index];
+                          const isVideo = file?.type?.startsWith('video/') || isVideoUrl(preview);
+                          return (
+                            <div key={`new-${index}`} className="relative aspect-square">
+                              {isVideo ? (
+                                <video
+                                  src={preview}
+                                  className={`w-full h-full object-cover rounded-lg ${existingImages.length === 0 && index === 0 ? 'ring-2 ring-primary' : ''}`}
+                                  muted
+                                />
+                              ) : (
+                                <img
+                                  src={preview}
+                                  alt={`New Image ${index + 1}`}
+                                  className={`w-full h-full object-cover rounded-lg ${existingImages.length === 0 && index === 0 ? 'ring-2 ring-primary' : ''}`}
+                                />
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => removeNewImage(index)}
+                                className="absolute -top-2 -left-2 bg-destructive text-destructive-foreground p-1 rounded-full"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                              {existingImages.length === 0 && index === 0 && (
+                                <span className="absolute bottom-1 right-1 bg-primary text-primary-foreground text-xs px-1 rounded">
+                                  رئيسية
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
                         <label className="aspect-square border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors">
                           <Plus className="w-6 h-6 text-muted-foreground" />
                           <span className="text-xs text-muted-foreground mt-1">إضافة</span>
                           <input
                             type="file"
-                            accept="image/*"
+                            accept="image/*,video/*"
                             multiple
                             onChange={handleImageChange}
                             className="hidden"
@@ -315,15 +342,15 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
                   ) : (
                     <label className="flex flex-col items-center justify-center h-48 cursor-pointer">
                       <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                      <span className="text-sm text-muted-foreground">اضغط لرفع صور المنتج</span>
-                      <span className="text-xs text-muted-foreground mt-1">يمكن اختيار عدة صور</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImageChange}
-                        className="hidden"
-                      />
+                      <span className="text-sm text-muted-foreground">اضغط لرفع صور أو فيديوهات المنتج</span>
+                      <span className="text-xs text-muted-foreground mt-1">يمكن اختيار عدة ملفات</span>
+                          <input
+                            type="file"
+                            accept="image/*,video/*"
+                            multiple
+                            onChange={handleImageChange}
+                            className="hidden"
+                          />
                     </label>
                   )}
                 </div>
