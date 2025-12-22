@@ -176,7 +176,7 @@ const Header = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background z-50 md:hidden"
+            className="fixed inset-0 bg-[#0a0a0a] z-[100] md:hidden"
           >
             <div className="flex items-center justify-between p-4 border-b border-border/50">
               <img src="/logo.png" alt="Timeless" className="h-12 w-auto object-contain" />
