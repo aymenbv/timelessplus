@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Menu, X, User } from 'lucide-react';
+import { Search, ShoppingCart, Menu, User } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import MobileMenuOverlay from '@/components/header/MobileMenuOverlay';
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -170,44 +170,11 @@ const Header = () => {
       </div>
 
       {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#0a0a0a] z-[100] md:hidden"
-          >
-            <div className="flex items-center justify-between p-4 border-b border-border/50">
-              <img src="/logo.png" alt="Timeless" className="h-12 w-auto object-contain" />
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-2 hover:text-primary transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            <nav className="flex flex-col items-center justify-center h-[calc(100vh-80px)] gap-8">
-              {navLinks.map((link, index) => (
-                <motion.div
-                  key={link.path}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Link
-                    to={link.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="font-display text-2xl text-primary hover:text-gold-light transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </motion.div>
-              ))}
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MobileMenuOverlay
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        navLinks={navLinks}
+      />
     </header>
   );
 };
