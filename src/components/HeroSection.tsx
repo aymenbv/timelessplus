@@ -20,13 +20,13 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4">
+      <div className="relative z-10 container mx-auto px-4 sm:px-6">
         <div className="text-center">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-display text-5xl md:text-7xl lg:text-8xl text-foreground mb-6"
+            className="font-display text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-foreground mb-4 sm:mb-6"
           >
             <span className="text-gradient-gold">أناقة</span>
             <br />
@@ -37,7 +37,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-8"
+            className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-6 sm:mb-8 px-2"
           >
             اكتشف مجموعتنا الحصرية من أرقى الساعات العالمية
           </motion.p>
@@ -46,8 +46,9 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center"
           >
-            <Link to="/products" className="btn-luxury inline-block glow-gold">
+            <Link to="/products" className="btn-luxury inline-block glow-gold w-full sm:w-auto text-center">
               استكشف الآن
             </Link>
           </motion.div>

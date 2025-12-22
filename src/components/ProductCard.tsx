@@ -36,23 +36,24 @@ const ProductCard = ({ product }: ProductCardProps) => {
             />
           </div>
 
-          <div className="p-4">
-            <p className="text-muted-foreground text-sm">{product.brand}</p>
-            <h3 className="font-display text-lg mt-1">{product.name}</h3>
-            <p className="text-primary font-semibold mt-2">{formatPrice(product.price)}</p>
+          <div className="p-2 sm:p-4">
+            <p className="text-muted-foreground text-xs sm:text-sm">{product.brand}</p>
+            <h3 className="font-display text-sm sm:text-lg mt-1 line-clamp-1">{product.name}</h3>
+            <p className="text-primary font-semibold mt-1 sm:mt-2 text-sm sm:text-base">{formatPrice(product.price)}</p>
           </div>
         </Link>
 
-        <div className="px-4 pb-4">
-          <div className="flex gap-2">
+        <div className="px-2 sm:px-4 pb-3 sm:pb-4">
+          <div className="flex gap-1 sm:gap-2">
             <button
               onClick={(e) => {
                 e.preventDefault();
                 addToCart(product);
               }}
-              className="btn-luxury flex-1 flex items-center justify-center gap-2 text-sm py-2"
+              className="btn-luxury flex-1 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-2 sm:px-4"
             >
-              أضف إلى السلة
+              <span className="hidden sm:inline">أضف إلى السلة</span>
+              <span className="sm:hidden">أضف</span>
             </button>
             <button
               onClick={(e) => {
