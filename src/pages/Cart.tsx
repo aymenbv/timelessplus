@@ -5,10 +5,13 @@ import Footer from '@/components/Footer';
 import { useCart } from '@/context/CartContext';
 import { useCreateOrder } from '@/hooks/useOrders';
 import WilayaSelect from '@/components/WilayaSelect';
-import { Trash2, Plus, Minus, Truck, CreditCard, ShieldCheck, Loader2 } from 'lucide-react';
+import { Trash2, Plus, Minus, Truck, CreditCard, ShieldCheck, Loader2, Tag, Check, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { z } from 'zod';
+
+const VALID_PROMO_CODE = 'TIMELESS2025';
+const PROMO_DISCOUNT = 0.10; // 10%
 
 const CUSTOMER_INFO_KEY = 'timeless_customer_info';
 const LAST_ORDER_KEY = 'timeless_last_order';
@@ -61,6 +64,29 @@ const Cart = () => {
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'card'>('cod');
   const [isCheckout, setIsCheckout] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [promoCode, setPromoCode] = useState('');
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState('');
+
+  const discount = promoApplied ? total * PROMO_DISCOUNT : 0;
+  const finalTotal = total - discount;
+
+  const handleApplyPromo = () => {
+    setPromoError('');
+    if (promoCode.trim().toUpperCase() === VALID_PROMO_CODE) {
+      setPromoApplied(true);
+      toast.success('تم تطبيق الكوبون: -10%');
+    } else {
+      setPromoApplied(false);
+      setPromoError('كود غير صالح');
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setPromoCode('');
+    setPromoApplied(false);
+    setPromoError('');
+  };
 
   // Save customer info as they type
   useEffect(() => {
@@ -102,7 +128,7 @@ const Cart = () => {
         wilaya,
         commune,
         paymentMethod,
-        total,
+        total: finalTotal,
         items,
       });
       
@@ -119,7 +145,8 @@ const Cart = () => {
           price: item.product.price,
           selectedColor: item.selectedColor,
         })),
-        total,
+        total: finalTotal,
+        discount: promoApplied ? discount : 0,
         createdAt: new Date().toISOString(),
       };
       
@@ -338,18 +365,69 @@ const Cart = () => {
                   ))}
                 </div>
 
+                {/* Promo Code Section */}
+                <div className="border-t border-border/50 mt-6 pt-6">
+                  <label className="block text-sm mb-2 flex items-center gap-2">
+                    <Tag className="w-4 h-4" />
+                    كود الخصم
+                  </label>
+                  {promoApplied ? (
+                    <div className="flex items-center justify-between bg-green-500/10 border border-green-500/30 rounded-lg px-4 py-3">
+                      <div className="flex items-center gap-2 text-green-500">
+                        <Check className="w-4 h-4" />
+                        <span className="text-sm font-medium">تم تطبيق الكوبون: -10%</span>
+                      </div>
+                      <button
+                        onClick={handleRemovePromo}
+                        className="text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={promoCode}
+                        onChange={(e) => {
+                          setPromoCode(e.target.value.toUpperCase());
+                          setPromoError('');
+                        }}
+                        placeholder="أدخل كود الخصم"
+                        className="flex-1 bg-background border border-border rounded-lg px-4 py-2 focus:outline-none focus:border-primary text-sm"
+                        dir="ltr"
+                      />
+                      <button
+                        onClick={handleApplyPromo}
+                        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                      >
+                        تطبيق
+                      </button>
+                    </div>
+                  )}
+                  {promoError && (
+                    <p className="text-destructive text-sm mt-2">{promoError}</p>
+                  )}
+                </div>
+
                 <div className="border-t border-border/50 mt-6 pt-6 space-y-3">
                   <div className="flex justify-between text-muted-foreground">
                     <span>المجموع الفرعي</span>
                     <span>{formatPrice(total)}</span>
                   </div>
+                  {promoApplied && (
+                    <div className="flex justify-between text-green-500">
+                      <span>الخصم (10%)</span>
+                      <span>- {formatPrice(discount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-muted-foreground">
                     <span>الشحن</span>
                     <span className="text-green-500">(مجاني)</span>
                   </div>
                   <div className="flex justify-between text-xl font-display pt-3 border-t border-border/50">
                     <span>الإجمالي:</span>
-                    <span className="text-primary">{formatPrice(total)}</span>
+                    <span className="text-primary">{formatPrice(finalTotal)}</span>
                   </div>
                 </div>
 
