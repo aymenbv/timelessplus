@@ -12,10 +12,24 @@ const teamMembers = [
 
 const About = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Video Background */}
+      <div className="fixed inset-0 z-0">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+        >
+          <source src="/about-video.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/70" />
+      </div>
+      
       <Header />
       
-      <main className="pt-20">
+      <main className="pt-20 relative z-10">
         {/* Hero Section */}
         <section className="py-24 px-4">
           <div className="container mx-auto text-center">
@@ -144,7 +158,9 @@ const About = () => {
         </section>
       </main>
 
-      <Footer />
+      <div className="relative z-10">
+        <Footer />
+      </div>
     </div>
   );
 };
