@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Star, Shield, Award, Truck, ChevronRight, Quote, Plus, User } from 'lucide-react';
+import { Star, Shield, Award, Truck, ChevronRight, Quote, Plus, User, Flame } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/context/CartContext';
 import { Product, Review } from '@/types';
@@ -186,6 +186,18 @@ const ProductDetails = () => {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ar-DZ').format(price) + ' دج';
   };
+
+  // Scarcity logic - generate consistent "stock" based on product ID
+  const getScarcityData = (productId: string) => {
+    // Use product ID to generate consistent random values
+    const hash = productId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const stockLeft = (hash % 5) + 1; // 1-5 pieces left
+    const soldPercentage = 75 + (hash % 20); // 75-94% sold
+    const isLowStock = stockLeft <= 3;
+    return { stockLeft, soldPercentage, isLowStock };
+  };
+
+  const scarcityData = id ? getScarcityData(id) : null;
   const handleAddToCart = () => {
     if (product) {
       addToCart(product, selectedColor || undefined);
@@ -356,6 +368,35 @@ const ProductDetails = () => {
 
             {/* Default Strap Style Selector */}
             {!product.colors || product.colors.length === 0}
+
+            {/* Scarcity Trigger */}
+            {product.inStock && scarcityData?.isLowStock && (
+              <div className="space-y-3 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex items-center justify-center">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75"></span>
+                    <Flame className="relative w-5 h-5 text-destructive" />
+                  </div>
+                  <span className="text-destructive font-bold text-sm">
+                    🔥 بقي {scarcityData.stockLeft} قطع فقط في المخزون!
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>تم البيع</span>
+                    <span className="font-medium text-destructive">{scarcityData.soldPercentage}%</span>
+                  </div>
+                  <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${scarcityData.soldPercentage}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      className="h-full bg-gradient-to-r from-destructive to-destructive/70 rounded-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-3">
