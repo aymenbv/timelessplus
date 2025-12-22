@@ -19,6 +19,7 @@ import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { isVideoUrl } from '@/lib/mediaUtils';
 const ProductDetails = () => {
   const {
     id
@@ -270,29 +271,45 @@ const ProductDetails = () => {
         }} transition={{
           duration: 0.5
         }} className="space-y-4">
-            {/* Main Image */}
+            {/* Main Image/Video */}
             <div 
               className="aspect-square overflow-hidden rounded-lg bg-secondary cursor-crosshair relative"
-              onMouseMove={handleMouseMove}
-              onMouseEnter={() => setIsZooming(true)}
+              onMouseMove={!isVideoUrl(allImages[selectedImage]) ? handleMouseMove : undefined}
+              onMouseEnter={() => !isVideoUrl(allImages[selectedImage]) && setIsZooming(true)}
               onMouseLeave={() => setIsZooming(false)}
             >
-              <img 
-                src={allImages[selectedImage] || product.image} 
-                alt={product.name} 
-                className="w-full h-full object-cover transition-transform duration-150 ease-out"
-                style={{
-                  transform: isZooming ? 'scale(2.5)' : 'scale(1)',
-                  transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
-                }}
-              />
+              {isVideoUrl(allImages[selectedImage] || product.image) ? (
+                <video 
+                  src={allImages[selectedImage] || product.image} 
+                  className="w-full h-full object-cover"
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+              ) : (
+                <img 
+                  src={allImages[selectedImage] || product.image} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover transition-transform duration-150 ease-out"
+                  style={{
+                    transform: isZooming ? 'scale(2.5)' : 'scale(1)',
+                    transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
+                  }}
+                />
+              )}
             </div>
             
             {/* Thumbnails - Horizontal Scrollable */}
             {allImages.length > 1 && <ScrollArea className="w-full whitespace-nowrap">
                 <div className="flex gap-3 pb-2">
                   {allImages.map((img, index) => <button key={index} onClick={() => setSelectedImage(index)} className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === index ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-muted-foreground'}`}>
-                      <img src={img} alt={`${product.name} - ${index + 1}`} className="w-full h-full object-cover" />
+                      {isVideoUrl(img) ? (
+                        <video src={img} className="w-full h-full object-cover" muted />
+                      ) : (
+                        <img src={img} alt={`${product.name} - ${index + 1}`} className="w-full h-full object-cover" />
+                      )}
                     </button>)}
                 </div>
                 <ScrollBar orientation="horizontal" />
