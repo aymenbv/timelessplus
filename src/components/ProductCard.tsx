@@ -5,6 +5,7 @@ import { Product } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { Eye } from 'lucide-react';
 import QuickViewModal from './QuickViewModal';
+import { isVideoUrl } from '@/lib/mediaUtils';
 
 interface ProductCardProps {
   product: Product;
@@ -29,11 +30,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
       >
         <Link to={`/product/${product.id}`}>
           <div className="relative aspect-square overflow-hidden bg-secondary">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            />
+            {isVideoUrl(product.image) ? (
+              <video
+                src={product.image}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                muted
+                loop
+                autoPlay
+                playsInline
+              />
+            ) : (
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+            )}
           </div>
 
           <div className="p-2 sm:p-4">
