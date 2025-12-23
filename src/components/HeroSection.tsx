@@ -1,7 +1,11 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
+  // Cache-bust the hero video so browsers fetch the latest uploaded file
+  const heroVideoSrc = useMemo(() => `/hero-video.mp4?v=${Date.now()}`, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
       {/* Video Background */}
@@ -13,7 +17,7 @@ const HeroSection = () => {
           playsInline
           className="w-full h-full object-cover"
         >
-          <source src="/hero-video.mp4" type="video/mp4" />
+          <source src={heroVideoSrc} type="video/mp4" />
         </video>
         {/* Dark overlay for better text readability */}
         <div className="absolute inset-0 bg-background/30" />
