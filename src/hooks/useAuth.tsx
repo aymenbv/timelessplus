@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, useEffect, useRef, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -19,28 +19,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const initialized = useRef(false);
+  const adminCheckInProgress = useRef(false);
 
   const checkAdminStatus = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .eq('role', 'admin')
-      .maybeSingle();
+    // Prevent multiple simultaneous admin checks
+    if (adminCheckInProgress.current) return;
+    adminCheckInProgress.current = true;
     
-    setIsAdmin(!!data);
+    try {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      setIsAdmin(!!data);
+    } finally {
+      adminCheckInProgress.current = false;
+    }
   };
 
   useEffect(() => {
+    // Prevent double initialization
+    if (initialized.current) return;
+    initialized.current = true;
+
+    let isMounted = true;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!isMounted) return;
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          // Use setTimeout to prevent race conditions
           setTimeout(() => {
-            checkAdminStatus(session.user.id);
-          }, 0);
+            if (isMounted) {
+              checkAdminStatus(session.user.id);
+            }
+          }, 100);
         } else {
           setIsAdmin(false);
         }
@@ -48,7 +69,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
+    // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!isMounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -57,7 +80,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
