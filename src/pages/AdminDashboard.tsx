@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProducts, useDeleteProduct } from '@/hooks/useProducts';
@@ -55,6 +55,7 @@ const AdminDashboard = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const hasRedirected = useRef(false);
 
   // Fetch reviews
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
@@ -81,8 +82,13 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
+    // Prevent multiple redirects
+    if (hasRedirected.current) return;
+    
+    // Only redirect after auth is fully loaded
     if (!authLoading && (!user || !isAdmin)) {
-      navigate('/admin');
+      hasRedirected.current = true;
+      navigate('/admin', { replace: true });
     }
   }, [authLoading, user, isAdmin, navigate]);
 

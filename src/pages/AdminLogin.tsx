@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Eye, EyeOff, Mail, User } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -27,10 +27,15 @@ const AdminLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signIn, signUp, user, isAdmin, loading } = useAuth();
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
+    // Prevent multiple redirects
+    if (hasRedirected.current) return;
+    
     if (!loading && user && isAdmin) {
-      navigate('/admin/dashboard');
+      hasRedirected.current = true;
+      navigate('/admin/dashboard', { replace: true });
     }
   }, [user, isAdmin, loading, navigate]);
 
