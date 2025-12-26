@@ -100,15 +100,15 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-2">
+          <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm tracking-wide transition-all px-4 py-2 rounded-lg backdrop-blur-sm hover:text-primary hover:bg-primary/10 ${
+                className={`text-sm tracking-wide transition-all px-4 py-2 rounded-lg ${
                   location.pathname === link.path 
-                    ? 'text-primary bg-primary/10' 
-                    : 'text-foreground bg-background/30'
+                    ? 'text-primary' 
+                    : 'text-foreground/90 hover:text-primary'
                 }`}
                 style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
               >
