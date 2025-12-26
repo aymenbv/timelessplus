@@ -11,6 +11,7 @@ interface OrderWithItems {
   total: number;
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered';
   created_at: string;
+  referral_code: string | null;
   order_items: {
     id: string;
     product_name: string;
@@ -49,6 +50,7 @@ export const useOrders = () => {
         total: Number(order.total),
         status: order.status,
         createdAt: new Date(order.created_at),
+        referralCode: order.referral_code || undefined,
         items: order.order_items.map((item) => ({
           product: {
             id: item.id,
@@ -82,6 +84,7 @@ export const useCreateOrder = () => {
       paymentMethod,
       total,
       items,
+      referralCode,
     }: {
       customerName: string;
       phone: string;
@@ -90,6 +93,7 @@ export const useCreateOrder = () => {
       paymentMethod: 'cod' | 'card';
       total: number;
       items: CartItem[];
+      referralCode?: string;
     }) => {
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -101,6 +105,7 @@ export const useCreateOrder = () => {
           payment_method: paymentMethod,
           total,
           status: 'pending',
+          referral_code: referralCode || null,
         })
         .select()
         .single();

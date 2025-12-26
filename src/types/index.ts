@@ -40,4 +40,5 @@ export interface Order {
   total: number;
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered';
   createdAt: Date;
+  referralCode?: string;
 }
