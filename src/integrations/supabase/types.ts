@@ -115,6 +115,7 @@ export type Database = {
           id: string
           image: string | null
           in_stock: boolean | null
+          is_featured: boolean | null
           material: Database["public"]["Enums"]["material_type"]
           movement: Database["public"]["Enums"]["movement_type"]
           name: string
@@ -132,6 +133,7 @@ export type Database = {
           id?: string
           image?: string | null
           in_stock?: boolean | null
+          is_featured?: boolean | null
           material: Database["public"]["Enums"]["material_type"]
           movement: Database["public"]["Enums"]["movement_type"]
           name: string
@@ -149,6 +151,7 @@ export type Database = {
           id?: string
           image?: string | null
           in_stock?: boolean | null
+          is_featured?: boolean | null
           material?: Database["public"]["Enums"]["material_type"]
           movement?: Database["public"]["Enums"]["movement_type"]
           name?: string

@@ -11,6 +11,7 @@ export interface Product {
   description: string;
   colors?: string[];
   inStock: boolean;
+  isFeatured?: boolean;
 }
 
 export interface Review {

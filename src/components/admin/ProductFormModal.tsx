@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Upload, Loader2, Plus } from 'lucide-react';
+import { X, Upload, Loader2, Plus, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,6 +41,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
     description: '',
     colors: [] as string[],
     inStock: true,
+    isFeatured: false,
   });
 
   useEffect(() => {
@@ -55,6 +56,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
         description: product.description || '',
         colors: product.colors || [],
         inStock: product.inStock,
+        isFeatured: product.isFeatured || false,
       });
       // Combine main image and gallery images for existing images
       const allImages: string[] = [];
@@ -75,6 +77,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
         description: '',
         colors: [],
         inStock: true,
+        isFeatured: false,
       });
       setExistingImages([]);
       setImagePreviews([]);
@@ -172,6 +175,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
         description: formData.description || null,
         colors: formData.colors,
         in_stock: formData.inStock,
+        is_featured: formData.isFeatured,
         image: mainImage,
         gallery_images: galleryImages,
       };
@@ -453,6 +457,30 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
                   className="w-5 h-5 rounded border-border accent-primary"
                 />
                 <label htmlFor="inStock" className="text-sm">متوفر في المخزون</label>
+              </div>
+
+              {/* Featured Product Toggle */}
+              <div className="flex items-center justify-between p-4 bg-primary/5 border border-primary/20 rounded-xl">
+                <div>
+                  <label htmlFor="isFeatured" className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                    <Star className="w-4 h-4 text-primary" />
+                    عرض في الصفحة الرئيسية
+                  </label>
+                  <p className="text-xs text-muted-foreground mt-1">سيظهر هذا المنتج في قسم المميزات</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, isFeatured: !formData.isFeatured })}
+                  className={`relative w-12 h-7 rounded-full transition-colors ${
+                    formData.isFeatured ? 'bg-primary' : 'bg-secondary'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                      formData.isFeatured ? 'right-1' : 'right-6'
+                    }`}
+                  />
+                </button>
               </div>
 
               {/* Submit */}
