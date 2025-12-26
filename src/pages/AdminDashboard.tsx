@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProducts, useDeleteProduct } from '@/hooks/useProducts';
-import { useOrders, useUpdateOrderStatus } from '@/hooks/useOrders';
+import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '@/hooks/useOrders';
+
 import {
   Package,
   ShoppingBag,
@@ -23,6 +24,7 @@ import {
   MapPin,
   Phone,
   User,
+  Search,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -47,6 +49,7 @@ const AdminDashboard = () => {
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: orders = [], isLoading: ordersLoading } = useOrders();
   const updateOrderStatus = useUpdateOrderStatus();
+  const deleteOrder = useDeleteOrder();
   const deleteProduct = useDeleteProduct();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'products' | 'reviews'>('overview');
@@ -56,6 +59,10 @@ const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const hasRedirected = useRef(false);
+  
+  // Orders search and filter state
+  const [orderSearch, setOrderSearch] = useState('');
+  const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'shipped' | 'delivered'>('all');
 
   // Fetch reviews
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
@@ -474,6 +481,31 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
+              {/* Search and Filter */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="ابحث باسم العميل أو رقم الطلب..."
+                    value={orderSearch}
+                    onChange={(e) => setOrderSearch(e.target.value)}
+                    className="w-full bg-card/50 border border-border/50 rounded-xl pr-12 pl-4 py-3 focus:outline-none focus:border-primary transition-colors"
+                  />
+                </div>
+                <select
+                  value={orderStatusFilter}
+                  onChange={(e) => setOrderStatusFilter(e.target.value as typeof orderStatusFilter)}
+                  className="bg-card/50 border border-border/50 rounded-xl px-4 py-3 focus:outline-none focus:border-primary cursor-pointer min-w-[150px]"
+                >
+                  <option value="all">جميع الحالات</option>
+                  <option value="pending">قيد الانتظار</option>
+                  <option value="confirmed">مؤكد</option>
+                  <option value="shipped">تم الشحن</option>
+                  <option value="delivered">تم التوصيل</option>
+                </select>
+              </div>
+
               {ordersLoading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -485,7 +517,15 @@ const AdminDashboard = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {orders.map((order, index) => (
+                  {orders
+                    .filter((order) => {
+                      const matchesSearch = orderSearch === '' || 
+                        order.customerName.toLowerCase().includes(orderSearch.toLowerCase()) ||
+                        order.id.toLowerCase().includes(orderSearch.toLowerCase());
+                      const matchesStatus = orderStatusFilter === 'all' || order.status === orderStatusFilter;
+                      return matchesSearch && matchesStatus;
+                    })
+                    .map((order, index) => (
                     <motion.div
                       key={order.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -505,6 +545,7 @@ const AdminDashboard = () => {
                                 {getStatusText(order.status)}
                               </span>
                             </div>
+                            <p className="text-xs text-muted-foreground/60 mt-0.5 font-mono">#{order.id.slice(0, 8)}</p>
                             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <Phone className="w-3.5 h-3.5" />
@@ -546,6 +587,21 @@ const AdminDashboard = () => {
                               className="p-2.5 bg-secondary hover:bg-primary/10 rounded-xl transition-colors"
                             >
                               <Eye className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (confirm('هل أنت متأكد من حذف هذا الطلب؟')) {
+                                  try {
+                                    await deleteOrder.mutateAsync(order.id);
+                                    toast.success('تم حذف الطلب');
+                                  } catch {
+                                    toast.error('فشل حذف الطلب');
+                                  }
+                                }
+                              }}
+                              className="p-2.5 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-xl transition-colors"
+                            >
+                              <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
                         </div>
@@ -660,7 +716,12 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <div className="p-4">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider">{product.brand}</p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wider">{product.brand}</p>
+                          {product.isFeatured && (
+                            <Star className="w-4 h-4 fill-primary text-primary" />
+                          )}
+                        </div>
                         <h3 className="font-display text-lg mt-1 line-clamp-1">{product.name}</h3>
                         <div className="flex items-center justify-between mt-3">
                           <p className="font-semibold text-primary">{formatPrice(product.price)}</p>

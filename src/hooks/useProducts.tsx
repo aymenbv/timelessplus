@@ -19,12 +19,14 @@ export const useProducts = () => {
         brand: p.brand,
         price: Number(p.price),
         image: p.image || '',
+        galleryImages: p.gallery_images || [],
         category: p.category as Product['category'],
         movement: p.movement as Product['movement'],
         material: p.material as Product['material'],
         description: p.description || '',
         colors: p.colors || [],
         inStock: p.in_stock ?? true,
+        isFeatured: p.is_featured ?? false,
       }));
     },
   });
