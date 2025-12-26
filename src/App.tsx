@@ -19,6 +19,8 @@ import TermsConditions from "./pages/TermsConditions";
 import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
 import TrackOrder from "./pages/TrackOrder";
+import Install from "./pages/Install";
+import InstallPWA from "./components/InstallPWA";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <InstallPWA />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -44,6 +47,7 @@ const App = () => (
               <Route path="/terms-conditions" element={<TermsConditions />} />
               <Route path="/search" element={<Search />} />
               <Route path="/track-order" element={<TrackOrder />} />
+              <Route path="/install" element={<Install />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
