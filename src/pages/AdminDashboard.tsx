@@ -869,6 +869,13 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
+              {selectedOrder.referralCode && (
+                <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                  <p className="text-xs text-amber-600 mb-1">كود الإحالة</p>
+                  <p className="font-semibold text-amber-700">{selectedOrder.referralCode}</p>
+                </div>
+              )}
+
               <div className="p-4 bg-secondary/30 rounded-xl">
                 <p className="text-xs text-muted-foreground mb-2">المنتجات</p>
                 <div className="space-y-2">
