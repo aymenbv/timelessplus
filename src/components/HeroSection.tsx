@@ -27,7 +27,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+    <section className="relative min-h-screen flex items-center justify-center bg-background pb-32">
       {/* Video Background */}
       <div className="absolute inset-0 z-0">
         <video
@@ -85,7 +85,7 @@ const HeroSection = () => {
 
       {/* Floating Featured Product Cards */}
       {featuredProducts.length > 0 && (
-        <div className="absolute bottom-0 left-0 right-0 z-20 transform translate-y-1/2">
+        <div className="absolute bottom-0 left-0 right-0 z-50 translate-y-1/2">
           <div className="container mx-auto px-4">
             <motion.div 
               initial={{ opacity: 0, y: 40 }}
@@ -102,7 +102,7 @@ const HeroSection = () => {
                 >
                   <Link
                     to={`/products/${product.id}`}
-                    className="group block bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-4 hover:bg-black/50 hover:border-primary/30 transition-all shadow-2xl"
+                    className="group block bg-black/50 backdrop-blur-xl border border-white/20 rounded-2xl p-4 hover:bg-black/60 hover:border-primary/30 transition-all shadow-2xl"
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
