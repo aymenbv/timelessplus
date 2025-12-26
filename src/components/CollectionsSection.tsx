@@ -5,7 +5,7 @@ import watchSmart from '@/assets/watch-smart.jpg';
 
 const CollectionsSection = () => {
   return (
-    <section className="py-20 bg-background">
+    <section className="pt-32 sm:pt-28 pb-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-6">
           {/* Luxury Collection */}
