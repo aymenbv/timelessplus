@@ -72,13 +72,12 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center"
           >
-            <button 
-              onClick={scrollToNextSection}
+            <Link 
+              to="/products"
               className="btn-luxury inline-flex items-center gap-2 glow-gold"
             >
               استكشف الآن
-              <ArrowDown className="w-4 h-4" />
-            </button>
+            </Link>
           </motion.div>
         </div>
       </div>
