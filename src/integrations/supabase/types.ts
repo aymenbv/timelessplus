@@ -111,6 +111,7 @@ export type Database = {
         Row: {
           brand: string
           category: Database["public"]["Enums"]["product_category"]
+          color_images: Json | null
           colors: string[] | null
           created_at: string | null
           description: string | null
@@ -129,6 +130,7 @@ export type Database = {
         Insert: {
           brand: string
           category: Database["public"]["Enums"]["product_category"]
+          color_images?: Json | null
           colors?: string[] | null
           created_at?: string | null
           description?: string | null
@@ -147,6 +149,7 @@ export type Database = {
         Update: {
           brand?: string
           category?: Database["public"]["Enums"]["product_category"]
+          color_images?: Json | null
           colors?: string[] | null
           created_at?: string | null
           description?: string | null

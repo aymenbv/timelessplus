@@ -25,6 +25,7 @@ export const useProducts = () => {
         material: p.material as Product['material'],
         description: p.description || '',
         colors: p.colors || [],
+        colorImages: (p.color_images as Record<string, string[]>) || {},
         inStock: p.in_stock ?? true,
         isFeatured: p.is_featured ?? false,
       }));

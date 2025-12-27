@@ -7,6 +7,7 @@ import { Product } from '@/types';
 import { z } from 'zod';
 import { isVideoUrl } from '@/lib/mediaUtils';
 import { getColorHex, colorMap } from '@/components/ColorSelector';
+import ColorImageManager from './ColorImageManager';
 
 const productSchema = z.object({
   name: z.string().min(2, 'اسم المنتج مطلوب'),
@@ -31,6 +32,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [colorImages, setColorImages] = useState<Record<string, string[]>>({});
   
   const [formData, setFormData] = useState({
     name: '',
@@ -67,6 +69,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
       }
       setExistingImages(allImages);
       setImagePreviews([]);
+      setColorImages(product.colorImages || {});
     } else {
       setFormData({
         name: '',
@@ -82,6 +85,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
       });
       setExistingImages([]);
       setImagePreviews([]);
+      setColorImages({});
     }
     setImageFiles([]);
     setErrors({});
@@ -179,6 +183,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
         is_featured: formData.isFeatured,
         image: mainImage,
         gallery_images: galleryImages,
+        color_images: colorImages,
       };
 
       if (product) {
@@ -514,6 +519,13 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
                   </div>
                 </div>
               </div>
+
+              {/* Color Images Manager */}
+              <ColorImageManager
+                colors={formData.colors}
+                colorImages={colorImages}
+                onColorImagesChange={setColorImages}
+              />
 
               {/* In Stock */}
               <div className="flex items-center gap-3">

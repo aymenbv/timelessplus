@@ -150,6 +150,7 @@ const ProductDetails = () => {
         material: data.material,
         description: data.description || '',
         colors: data.colors || [],
+        colorImages: (data.color_images as Record<string, string[]>) || {},
         inStock: data.in_stock ?? true
       } as Product;
     },
@@ -220,8 +221,15 @@ const ProductDetails = () => {
       </div>;
   };
 
-  // Build gallery images array - main image + gallery_images
-  const allImages = product ? [product.image, ...(product.galleryImages || [])].filter(Boolean) : [];
+  // Build gallery images array - prioritize color images if a color is selected
+  const allImages = product ? (() => {
+    // If a color is selected and has images, use those
+    if (selectedColor && product.colorImages?.[selectedColor]?.length > 0) {
+      return product.colorImages[selectedColor];
+    }
+    // Otherwise, use main image + gallery_images
+    return [product.image, ...(product.galleryImages || [])].filter(Boolean);
+  })() : [];
   if (isLoading) {
     return <div className="min-h-screen bg-background">
         <Header />
@@ -370,9 +378,17 @@ const ProductDetails = () => {
                 <ColorSelector
                   colors={product.colors}
                   selectedColor={selectedColor}
-                  onColorSelect={setSelectedColor}
+                  onColorSelect={(color) => {
+                    setSelectedColor(color);
+                    setSelectedImage(0); // Reset to first image when color changes
+                  }}
                   size="lg"
                 />
+                {product.colorImages && Object.keys(product.colorImages).length > 0 && selectedColor && product.colorImages[selectedColor] && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {product.colorImages[selectedColor].length} صورة متاحة لهذا اللون
+                  </p>
+                )}
               </div>
             )}
 

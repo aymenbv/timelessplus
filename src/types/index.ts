@@ -10,6 +10,7 @@ export interface Product {
   material: 'leather' | 'metal' | 'rubber';
   description: string;
   colors?: string[];
+  colorImages?: Record<string, string[]>;
   inStock: boolean;
   isFeatured?: boolean;
 }
