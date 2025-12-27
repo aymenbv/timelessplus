@@ -5,6 +5,7 @@ import { Product } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import ColorSelector from './ColorSelector';
 
 interface QuickViewModalProps {
   product: Product;
@@ -173,7 +174,16 @@ const QuickViewModal = ({
                   {product.description}
                 </p>
 
-                {product.colors && product.colors.length > 0}
+                {product.colors && product.colors.length > 0 && (
+                  <div className="mt-4">
+                    <ColorSelector
+                      colors={product.colors}
+                      selectedColor={selectedColor}
+                      onColorSelect={setSelectedColor}
+                      size="md"
+                    />
+                  </div>
+                )}
 
                 <div className="mt-auto pt-6 space-y-3">
                   <button onClick={handleAddToCart} className="btn-luxury w-full text-center">

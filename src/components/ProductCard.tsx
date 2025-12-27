@@ -6,6 +6,7 @@ import { useCart } from '@/context/CartContext';
 import { Eye } from 'lucide-react';
 import QuickViewModal from './QuickViewModal';
 import { isVideoUrl } from '@/lib/mediaUtils';
+import ColorIndicators from './ColorIndicators';
 
 interface ProductCardProps {
   product: Product;
@@ -51,7 +52,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <div className="p-2 sm:p-4">
             <p className="text-muted-foreground text-xs sm:text-sm">{product.brand}</p>
             <h3 className="font-display text-sm sm:text-lg mt-1 line-clamp-1">{product.name}</h3>
-            <p className="text-primary font-semibold mt-1 sm:mt-2 text-sm sm:text-base">{formatPrice(product.price)}</p>
+            <div className="flex items-center justify-between mt-1 sm:mt-2">
+              <p className="text-primary font-semibold text-sm sm:text-base">{formatPrice(product.price)}</p>
+              <ColorIndicators colors={product.colors || []} maxShow={4} size="xs" />
+            </div>
           </div>
         </Link>
 
@@ -60,7 +64,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                addToCart(product);
+                // استخدام اللون الأول كافتراضي
+                const defaultColor = product.colors?.[0];
+                addToCart(product, defaultColor);
               }}
               className="btn-luxury flex-1 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-2 sm:px-4"
             >
