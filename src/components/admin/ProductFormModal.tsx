@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types';
 import { z } from 'zod';
 import { isVideoUrl } from '@/lib/mediaUtils';
+import { getColorHex, colorMap } from '@/components/ColorSelector';
 
 const productSchema = z.object({
   name: z.string().min(2, 'اسم المنتج مطلوب'),
@@ -224,6 +225,19 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
     { value: 'metal', label: 'معدن' },
     { value: 'rubber', label: 'مطاط' },
   ];
+
+  // قائمة الألوان المتاحة للاختيار
+  const availableColors = Object.keys(colorMap).filter(c => !c.match(/^[a-z]/)); // فقط الألوان العربية
+
+  const addColor = (color: string) => {
+    if (!formData.colors.includes(color)) {
+      setFormData({ ...formData, colors: [...formData.colors, color] });
+    }
+  };
+
+  const removeColor = (color: string) => {
+    setFormData({ ...formData, colors: formData.colors.filter(c => c !== color) });
+  };
 
   const allPreviews = [...existingImages, ...imagePreviews];
 
@@ -445,6 +459,60 @@ const ProductFormModal = ({ isOpen, onClose, product, onSuccess }: ProductFormMo
                   rows={3}
                   className="w-full bg-background border border-border rounded-lg px-4 py-3 focus:outline-none focus:border-primary resize-none"
                 />
+              </div>
+
+              {/* Colors Section */}
+              <div>
+                <label className="block text-sm font-medium mb-2">الألوان المتاحة</label>
+                
+                {/* Selected Colors */}
+                {formData.colors.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {formData.colors.map((color) => (
+                      <span
+                        key={color}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary rounded-full text-sm"
+                      >
+                        <span
+                          className="w-4 h-4 rounded-full border border-border/50"
+                          style={{ backgroundColor: getColorHex(color) }}
+                        />
+                        {color}
+                        <button
+                          type="button"
+                          onClick={() => removeColor(color)}
+                          className="text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Color Picker */}
+                <div className="border border-border rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground mb-2">اختر الألوان:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {availableColors.map((color) => {
+                      const isSelected = formData.colors.includes(color);
+                      return (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => isSelected ? removeColor(color) : addColor(color)}
+                          className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
+                            isSelected 
+                              ? 'border-primary ring-2 ring-primary/30' 
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                          style={{ backgroundColor: getColorHex(color) }}
+                          title={color}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               {/* In Stock */}

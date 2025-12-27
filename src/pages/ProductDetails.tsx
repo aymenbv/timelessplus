@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { isVideoUrl } from '@/lib/mediaUtils';
+import ColorSelector from '@/components/ColorSelector';
 const ProductDetails = () => {
   const {
     id
@@ -364,10 +365,16 @@ const ProductDetails = () => {
             </p>
 
             {/* Color Selector */}
-            {product.colors && product.colors.length > 0}
-
-            {/* Default Strap Style Selector */}
-            {!product.colors || product.colors.length === 0}
+            {product.colors && product.colors.length > 0 && (
+              <div className="py-4 border-y border-border">
+                <ColorSelector
+                  colors={product.colors}
+                  selectedColor={selectedColor}
+                  onColorSelect={setSelectedColor}
+                  size="lg"
+                />
+              </div>
+            )}
 
             {/* Scarcity Trigger */}
             {product.inStock && scarcityData?.isLowStock && (
