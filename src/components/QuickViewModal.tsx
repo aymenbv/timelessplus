@@ -78,14 +78,15 @@ const QuickViewModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-start md:items-center justify-center p-4 overflow-y-auto overscroll-contain"
           onClick={onClose}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-card border-2 border-primary/30 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-card border-2 border-primary/30 rounded-lg max-w-4xl w-full md:max-h-[90vh] max-h-[90dvh] overflow-y-auto overscroll-contain"
+            style={{ WebkitOverflowScrolling: 'touch' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="grid md:grid-cols-2">
@@ -97,6 +98,7 @@ const QuickViewModal = ({
                     src={allImages[currentImageIndex] || product.image}
                     alt={product.name}
                     className="w-full h-full object-cover absolute inset-0 cursor-grab active:cursor-grabbing"
+                    style={{ touchAction: allImages.length > 1 ? 'pan-y' : 'auto' }}
                     custom={slideDirection}
                     variants={slideVariants}
                     initial="enter"
