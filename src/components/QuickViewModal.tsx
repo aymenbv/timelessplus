@@ -85,12 +85,12 @@ const QuickViewModal = ({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-card border-2 border-primary/30 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden"
+            className="bg-card border-2 border-primary/30 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="grid md:grid-cols-2">
               {/* Image Section */}
-              <div className="relative aspect-square bg-secondary overflow-hidden touch-pan-y">
+              <div className="relative aspect-square max-h-[50vh] md:max-h-none bg-secondary overflow-hidden touch-pan-y">
                 <AnimatePresence initial={false} custom={slideDirection} mode="wait">
                   <motion.img
                     key={currentImageIndex}
@@ -153,7 +153,7 @@ const QuickViewModal = ({
               </div>
 
               {/* Content Section */}
-              <div className="p-8 flex flex-col" dir="rtl">
+              <div className="p-6 md:p-8 pb-8 flex flex-col" dir="rtl">
                 <button
                   onClick={onClose}
                   className="absolute top-4 left-4 p-2 text-muted-foreground hover:text-foreground transition-colors"
