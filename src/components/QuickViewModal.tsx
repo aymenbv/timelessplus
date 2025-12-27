@@ -23,15 +23,20 @@ const QuickViewModal = ({
   const [slideDirection, setSlideDirection] = useState(0);
   const { addToCart } = useCart();
 
-  // Combine main image with gallery images
+  // Combine main image with gallery images, or use color-specific images
   const allImages = useMemo(() => {
+    // If a color is selected and has images, use those
+    if (selectedColor && product.colorImages?.[selectedColor]?.length > 0) {
+      return product.colorImages[selectedColor];
+    }
+    // Otherwise, use main image + gallery_images
     const images: string[] = [];
     if (product.image) images.push(product.image);
     if (product.galleryImages && product.galleryImages.length > 0) {
       images.push(...product.galleryImages);
     }
     return images;
-  }, [product.image, product.galleryImages]);
+  }, [product.image, product.galleryImages, product.colorImages, selectedColor]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ar-DZ').format(price) + ' دج';
@@ -179,9 +184,17 @@ const QuickViewModal = ({
                     <ColorSelector
                       colors={product.colors}
                       selectedColor={selectedColor}
-                      onColorSelect={setSelectedColor}
+                      onColorSelect={(color) => {
+                        setSelectedColor(color);
+                        setCurrentImageIndex(0); // Reset to first image when color changes
+                      }}
                       size="md"
                     />
+                    {product.colorImages && selectedColor && product.colorImages[selectedColor] && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {product.colorImages[selectedColor].length} صورة لهذا اللون
+                      </p>
+                    )}
                   </div>
                 )}
 

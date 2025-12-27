@@ -50,7 +50,7 @@ export const getColorHex = (colorName: string): string => {
 };
 
 // دالة لتحديد إذا كان اللون فاتح (لتحديد لون الأيقونة)
-const isLightColor = (hex: string): boolean => {
+export const isLightColor = (hex: string): boolean => {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
