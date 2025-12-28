@@ -54,7 +54,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <h3 className="font-display text-sm sm:text-lg mt-1 line-clamp-1">{product.name}</h3>
             <div className="flex items-center justify-between mt-1 sm:mt-2">
               <p className="text-primary font-semibold text-sm sm:text-base">{formatPrice(product.price)}</p>
-              <ColorIndicators colors={product.colors || []} maxShow={4} size="xs" />
+              <ColorIndicators colors={product.colors || []} colorImages={product.colorImages} maxShow={4} size="xs" />
             </div>
           </div>
         </Link>
