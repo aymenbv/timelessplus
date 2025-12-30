@@ -30,7 +30,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
         transition={{ duration: 0.5 }}
       >
         <Link to={`/product/${product.id}`}>
-          <div className="relative aspect-square overflow-hidden bg-secondary">
+          {/* Fixed height on mobile for consistent vertical scrolling, aspect-square on larger screens */}
+          <div className="relative h-48 sm:h-auto sm:aspect-square overflow-hidden bg-secondary">
             {isVideoUrl(product.image) ? (
               <video
                 src={product.image}
@@ -49,38 +50,38 @@ const ProductCard = ({ product }: ProductCardProps) => {
             )}
           </div>
 
-          <div className="p-2 sm:p-4">
+          <div className="p-3 sm:p-4">
             <p className="text-muted-foreground text-xs sm:text-sm">{product.brand}</p>
             <h3 className="font-display text-sm sm:text-lg mt-1 line-clamp-1">{product.name}</h3>
-            <div className="flex items-center justify-between mt-1 sm:mt-2">
+            <div className="flex items-center justify-between mt-2">
               <p className="text-primary font-semibold text-sm sm:text-base">{formatPrice(product.price)}</p>
               <ColorIndicators colors={product.colors || []} colorImages={product.colorImages} maxShow={4} size="xs" />
             </div>
           </div>
         </Link>
 
-        <div className="px-2 sm:px-4 pb-3 sm:pb-4">
-          <div className="flex gap-1 sm:gap-2">
+        {/* Touch-optimized buttons with 44px minimum height */}
+        <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+          <div className="flex gap-2">
             <button
               onClick={(e) => {
                 e.preventDefault();
-                // استخدام اللون الأول كافتراضي
                 const defaultColor = product.colors?.[0];
                 addToCart(product, defaultColor);
               }}
-              className="btn-luxury flex-1 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-2 sm:px-4"
+              className="btn-luxury flex-1 flex items-center justify-center gap-2 text-xs sm:text-sm min-h-[44px]"
             >
               <span className="hidden sm:inline">أضف إلى السلة</span>
-              <span className="sm:hidden">أضف</span>
+              <span className="sm:hidden">أضف للسلة</span>
             </button>
             <button
               onClick={(e) => {
                 e.preventDefault();
                 setShowQuickView(true);
               }}
-              className="btn-luxury-outline p-2"
+              className="btn-luxury-outline p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
-              <Eye className="w-4 h-4" />
+              <Eye className="w-5 h-5" />
             </button>
           </div>
         </div>

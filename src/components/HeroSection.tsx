@@ -7,7 +7,7 @@ const HeroSection = () => {
   const heroVideoSrc = useMemo(() => `/hero-video.mp4?v=${Date.now()}`, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-background">
+    <section className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
       {/* Video Background */}
       <div className="absolute inset-0 z-0">
         <video
@@ -23,14 +23,15 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/20 to-background/60" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6">
+      {/* Content - with proper padding to prevent edge touching */}
+      <div className="relative z-10 container mx-auto px-4">
         <div className="text-center">
+          {/* Mobile-first typography: small base, scales up */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-display text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-foreground mb-4 sm:mb-6"
+            className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl text-foreground mb-4 sm:mb-6 leading-tight"
           >
             <span className="text-gradient-gold">أناقة</span>
             <br />
@@ -41,7 +42,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 sm:mb-12 px-2"
+            className="text-muted-foreground text-sm sm:text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-8 sm:mb-12"
           >
             اكتشف مجموعتنا الحصرية من أرقى الساعات العالمية
           </motion.p>
@@ -53,7 +54,7 @@ const HeroSection = () => {
           >
             <Link 
               to="/products"
-              className="btn-luxury inline-flex items-center gap-2 glow-gold"
+              className="btn-luxury inline-flex items-center gap-2 glow-gold min-h-[44px]"
             >
               استكشف الآن
             </Link>

@@ -125,20 +125,68 @@
 }
 
 @layer components {
+  /* Mobile-first button styles with minimum 44px touch target */
   .btn-luxury {
-    @apply bg-primary text-primary-foreground font-medium px-8 py-3 
-           tracking-widest uppercase text-sm transition-all duration-300
+    @apply bg-primary text-primary-foreground font-medium px-4 py-3 min-h-[44px]
+           tracking-widest uppercase text-xs transition-all duration-300
            hover:bg-gold-light hover:shadow-lg hover:shadow-primary/20;
   }
 
   .btn-luxury-outline {
-    @apply border border-primary text-primary font-medium px-8 py-3
-           tracking-widest uppercase text-sm transition-all duration-300
+    @apply border border-primary text-primary font-medium px-4 py-3 min-h-[44px]
+           tracking-widest uppercase text-xs transition-all duration-300
            hover:bg-primary hover:text-primary-foreground;
   }
 
   .card-luxury {
     @apply bg-card border border-border/50 rounded-lg overflow-hidden
            transition-all duration-500 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10;
+  }
+
+  /* Larger padding on tablet and up */
+  @media (min-width: 768px) {
+    .btn-luxury {
+      @apply px-8 text-sm;
+    }
+    .btn-luxury-outline {
+      @apply px-8 text-sm;
+    }
+  }
+}
+
+/* Mobile-first typography scaling */
+@layer base {
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+  
+  @media (min-width: 640px) {
+    h1 {
+      @apply text-3xl;
+    }
+    h2 {
+      @apply text-2xl;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    h1 {
+      @apply text-4xl;
+    }
+    h2 {
+      @apply text-3xl;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    h1 {
+      @apply text-5xl;
+    }
+    h2 {
+      @apply text-4xl;
+    }
   }
 }
