@@ -168,10 +168,10 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}
-                className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all aspect-square ${
+                className={`flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border-2 transition-all ${
                   selectedImage === index
-                    ? 'border-primary ring-2 ring-primary/30'
-                    : 'border-transparent hover:border-muted-foreground'
+                    ? 'border-[#D4AF37] ring-2 ring-[#D4AF37]/30 scale-105'
+                    : 'border-border/50 hover:border-[#D4AF37]/50 opacity-70 hover:opacity-100'
                 }`}
               >
                 {isVideoUrl(img) ? (
