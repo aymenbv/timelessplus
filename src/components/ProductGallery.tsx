@@ -80,54 +80,96 @@ const ProductGallery = ({
   return <div className="space-y-3">
       {/* Mobile: Embla Carousel with Pinch-to-Zoom */}
       <div className="md:hidden">
-        <div className="overflow-hidden rounded-lg" ref={emblaRef}>
+        <div 
+          className="overflow-hidden rounded-lg" 
+          ref={emblaRef}
+          style={{ touchAction: 'pan-y pinch-zoom' }}
+        >
           <div className="flex">
-            {images.map((img, index) => <div key={index} className="flex-shrink-0 w-full aspect-[3/4] max-h-[60vh] bg-secondary">
-                {isVideoUrl(img) ? <video src={img} className="w-full h-full object-cover" controls autoPlay={index === selectedImage} muted loop playsInline /> : <TransformWrapper initialScale={1} minScale={1} maxScale={4} centerOnInit onZoomStart={() => setIsZoomedIn(true)} onZoomStop={ref => {
-              if (ref.state.scale <= 1.1) {
-                setIsZoomedIn(false);
-              }
-            }} onPanning={() => setIsZoomedIn(true)} onTransformed={(_, state) => {
-              if (state.scale <= 1.1) {
-                setIsZoomedIn(false);
-              } else {
-                setIsZoomedIn(true);
-              }
-            }} panning={{
-              disabled: false
-            }} pinch={{
-              disabled: false
-            }} doubleClick={{
-              mode: 'toggle'
-            }}>
-                    {({
-                resetTransform
-              }) => <TransformComponent wrapperStyle={{
-                width: '100%',
-                height: '100%'
-              }} contentStyle={{
-                width: '100%',
-                height: '100%'
-              }}>
-                        <img src={img} alt={`${productName} - ${index + 1}`} className="w-full h-full object-cover" loading={index === 0 ? 'eager' : 'lazy'} draggable={false} onDoubleClick={() => {
-                  if (isZoomedIn) {
-                    resetTransform();
-                    setIsZoomedIn(false);
-                  }
-                }} />
-                      </TransformComponent>}
-                  </TransformWrapper>}
-              </div>)}
+            {images.map((img, index) => (
+              <div 
+                key={index} 
+                className="flex-shrink-0 w-full min-w-full aspect-[3/4] max-h-[60vh] bg-secondary"
+                style={{ flex: '0 0 100%' }}
+              >
+                {isVideoUrl(img) ? (
+                  <video 
+                    src={img} 
+                    className="w-full h-full object-cover" 
+                    controls 
+                    autoPlay={index === selectedImage} 
+                    muted 
+                    loop 
+                    playsInline 
+                  />
+                ) : (
+                  <TransformWrapper 
+                    initialScale={1} 
+                    minScale={1} 
+                    maxScale={4} 
+                    centerOnInit 
+                    onZoomStart={() => setIsZoomedIn(true)} 
+                    onZoomStop={ref => {
+                      if (ref.state.scale <= 1.1) {
+                        setIsZoomedIn(false);
+                      }
+                    }} 
+                    onPanning={() => setIsZoomedIn(true)} 
+                    onTransformed={(_, state) => {
+                      if (state.scale <= 1.1) {
+                        setIsZoomedIn(false);
+                      } else {
+                        setIsZoomedIn(true);
+                      }
+                    }} 
+                    panning={{ disabled: false }}
+                    pinch={{ disabled: false }}
+                    doubleClick={{ mode: 'toggle' }}
+                  >
+                    {({ resetTransform }) => (
+                      <TransformComponent 
+                        wrapperStyle={{ width: '100%', height: '100%' }}
+                        contentStyle={{ width: '100%', height: '100%' }}
+                      >
+                        <img 
+                          src={img} 
+                          alt={`${productName} - ${index + 1}`} 
+                          className="w-full h-full object-cover" 
+                          loading={index < 3 ? 'eager' : 'lazy'}
+                          draggable={false} 
+                          onDoubleClick={() => {
+                            if (isZoomedIn) {
+                              resetTransform();
+                              setIsZoomedIn(false);
+                            }
+                          }} 
+                        />
+                      </TransformComponent>
+                    )}
+                  </TransformWrapper>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Pagination Dots */}
-        {images.length > 1 && <div className="flex justify-center gap-2 mt-3">
-            {images.map((_, index) => <button key={index} onClick={() => scrollToSlide(index)} className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${index === selectedImage ? 'bg-[#D4AF37] scale-110' : 'bg-muted-foreground/40 hover:bg-muted-foreground/60'}`} aria-label={`Go to image ${index + 1}`} />)}
-          </div>}
-
-        {/* Zoom hint */}
-        {!isZoomedIn && images.length > 0 && !isVideoUrl(images[0])}
+        {images.length > 1 && (
+          <div className="flex justify-center gap-2 mt-3">
+            {images.map((_, index) => (
+              <button 
+                key={index} 
+                onClick={() => scrollToSlide(index)} 
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
+                  index === selectedImage 
+                    ? 'bg-[#D4AF37] scale-110' 
+                    : 'bg-muted-foreground/40 hover:bg-muted-foreground/60'
+                }`} 
+                aria-label={`Go to image ${index + 1}`} 
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Desktop: Main Image + Thumbnails */}
