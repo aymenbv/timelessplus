@@ -17,14 +17,21 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
   const [mobileZoom, setMobileZoom] = useState<{ index: number; zoomed: boolean; x: number; y: number } | null>(null);
   const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(null);
 
-  // Reset selected image when images array changes
+  // Track previous images length to only reset when truly needed
+  const prevImagesLengthRef = useRef(images.length);
+  
+  // Only reset selected image if images array became shorter and current index is out of bounds
   useEffect(() => {
-    setSelectedImage(0);
-  }, [images]);
+    if (selectedImage >= images.length && images.length > 0) {
+      setSelectedImage(images.length - 1);
+    }
+    prevImagesLengthRef.current = images.length;
+  }, [images.length, selectedImage]);
 
-  // IntersectionObserver to detect which slide is visible
+  // IntersectionObserver to detect which slide is visible - only update on user scroll
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
+    let scrollTimeout: NodeJS.Timeout;
     
     slideRefs.current.forEach((slide, index) => {
       if (!slide) return;
@@ -32,12 +39,16 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting && entry.intersectionRatio > 0.5 && !isNavigatingRef.current) {
-              setSelectedImage(index);
+            // Only update if user is actually scrolling (not programmatic) and not navigating
+            if (entry.isIntersecting && entry.intersectionRatio > 0.6 && !isNavigatingRef.current) {
+              clearTimeout(scrollTimeout);
+              scrollTimeout = setTimeout(() => {
+                setSelectedImage(index);
+              }, 100);
             }
           });
         },
-        { threshold: 0.5 }
+        { threshold: 0.6 }
       );
       
       observer.observe(slide);
@@ -46,8 +57,9 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
 
     return () => {
       observers.forEach((observer) => observer.disconnect());
+      clearTimeout(scrollTimeout);
     };
-  }, [images]);
+  }, [images.length]); // Only re-observe when count changes, not content
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -128,9 +140,14 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
         <div
           dir="ltr"
           className={`flex overflow-x-auto snap-x snap-mandatory scrollbar-hide max-h-[60vh] overscroll-x-contain ${
-            mobileZoom?.zoomed ? 'overflow-hidden' : 'touch-pan-x'
+            mobileZoom?.zoomed ? 'overflow-hidden' : ''
           }`}
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          style={{ 
+            scrollbarWidth: 'none', 
+            msOverflowStyle: 'none',
+            touchAction: mobileZoom?.zoomed ? 'none' : 'pan-y pan-x',
+            WebkitOverflowScrolling: 'touch'
+          }}
         >
           {images.map((img, index) => {
             const isZoomedImage = mobileZoom?.index === index && mobileZoom.zoomed;
