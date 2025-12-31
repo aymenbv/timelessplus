@@ -27,9 +27,11 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
     setZoomPosition({ x, y });
   };
 
+  const isScrollingRef = useRef(false);
+
   // Handle scroll snap to update active dot
   const handleScroll = () => {
-    if (!carouselRef.current) return;
+    if (!carouselRef.current || isScrollingRef.current) return;
     const scrollLeft = carouselRef.current.scrollLeft;
     const itemWidth = carouselRef.current.offsetWidth;
     const newIndex = Math.round(scrollLeft / itemWidth);
@@ -38,12 +40,18 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
     }
   };
 
-  // Scroll to image on thumbnail click (desktop)
+  // Scroll to image on dot/thumbnail click
   const scrollToImage = (index: number) => {
+    if (index === selectedImage) return;
+    isScrollingRef.current = true;
     setSelectedImage(index);
     if (carouselRef.current) {
       const itemWidth = carouselRef.current.offsetWidth;
       carouselRef.current.scrollTo({ left: index * itemWidth, behavior: 'smooth' });
+      // Reset flag after scroll animation
+      setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 400);
     }
   };
 
