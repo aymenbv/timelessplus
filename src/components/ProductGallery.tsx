@@ -12,6 +12,10 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
   const [isZooming, setIsZooming] = useState(false);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const isNavigatingRef = useRef(false);
+  
+  // Mobile double-tap zoom state
+  const [mobileZoom, setMobileZoom] = useState<{ index: number; zoomed: boolean; x: number; y: number } | null>(null);
+  const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(null);
 
   // Reset selected image when images array changes
   useEffect(() => {
@@ -69,6 +73,51 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
     }
   }, [selectedImage]);
 
+  // Handle double-tap zoom on mobile
+  const handleDoubleTap = useCallback((e: React.TouchEvent<HTMLDivElement>, index: number) => {
+    const touch = e.touches[0] || e.changedTouches[0];
+    const now = Date.now();
+    const lastTap = lastTapRef.current;
+    
+    if (lastTap && now - lastTap.time < 300 && 
+        Math.abs(touch.clientX - lastTap.x) < 30 && 
+        Math.abs(touch.clientY - lastTap.y) < 30) {
+      // Double tap detected
+      e.preventDefault();
+      
+      if (mobileZoom?.index === index && mobileZoom.zoomed) {
+        // Zoom out
+        setMobileZoom(null);
+      } else {
+        // Zoom in at tap position
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((touch.clientX - rect.left) / rect.width) * 100;
+        const y = ((touch.clientY - rect.top) / rect.height) * 100;
+        setMobileZoom({ index, zoomed: true, x, y });
+      }
+      lastTapRef.current = null;
+    } else {
+      lastTapRef.current = { time: now, x: touch.clientX, y: touch.clientY };
+    }
+  }, [mobileZoom]);
+
+  // Handle touch move for panning when zoomed
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>, index: number) => {
+    if (mobileZoom?.index === index && mobileZoom.zoomed) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((touch.clientX - rect.left) / rect.width) * 100;
+      const y = ((touch.clientY - rect.top) / rect.height) * 100;
+      setMobileZoom(prev => prev ? { ...prev, x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) } : null);
+    }
+  }, [mobileZoom]);
+
+  // Reset zoom when changing images
+  useEffect(() => {
+    setMobileZoom(null);
+  }, [selectedImage]);
+
   const currentImage = images[selectedImage] || images[0];
   const isVideo = isVideoUrl(currentImage);
 
@@ -78,36 +127,60 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
       <div className="md:hidden">
         <div
           dir="ltr"
-          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide max-h-[60vh] touch-pan-x overscroll-x-contain"
+          className={`flex overflow-x-auto snap-x snap-mandatory scrollbar-hide max-h-[60vh] overscroll-x-contain ${
+            mobileZoom?.zoomed ? 'overflow-hidden' : 'touch-pan-x'
+          }`}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {images.map((img, index) => (
-            <div
-              key={index}
-              ref={(el) => (slideRefs.current[index] = el)}
-              className="flex-shrink-0 w-full snap-center snap-always aspect-[3/4] max-h-[60vh] bg-secondary rounded-lg overflow-hidden"
-            >
-              {isVideoUrl(img) ? (
-                <video
-                  src={img}
-                  className="w-full h-full object-cover"
-                  controls
-                  autoPlay={index === selectedImage}
-                  muted
-                  loop
-                  playsInline
-                />
-              ) : (
-                <img
-                  src={img}
-                  alt={`${productName} - ${index + 1}`}
-                  className="w-full h-full object-cover"
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  draggable={false}
-                />
-              )}
-            </div>
-          ))}
+          {images.map((img, index) => {
+            const isZoomedImage = mobileZoom?.index === index && mobileZoom.zoomed;
+            return (
+              <div
+                key={index}
+                ref={(el) => (slideRefs.current[index] = el)}
+                className="flex-shrink-0 w-full snap-center snap-always aspect-[3/4] max-h-[60vh] bg-secondary rounded-lg overflow-hidden relative"
+                onTouchStart={(e) => !isVideoUrl(img) && handleDoubleTap(e, index)}
+                onTouchMove={(e) => handleTouchMove(e, index)}
+              >
+                {isVideoUrl(img) ? (
+                  <video
+                    src={img}
+                    className="w-full h-full object-cover"
+                    controls
+                    autoPlay={index === selectedImage}
+                    muted
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <>
+                    <img
+                      src={img}
+                      alt={`${productName} - ${index + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-200 ease-out"
+                      style={{
+                        transform: isZoomedImage ? 'scale(2.5)' : 'scale(1)',
+                        transformOrigin: isZoomedImage ? `${mobileZoom.x}% ${mobileZoom.y}%` : 'center',
+                      }}
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      draggable={false}
+                    />
+                    {/* Zoom indicator */}
+                    {!isZoomedImage && (
+                      <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full pointer-events-none">
+                        اضغط مرتين للتكبير
+                      </div>
+                    )}
+                    {isZoomedImage && (
+                      <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full pointer-events-none">
+                        اضغط مرتين للتصغير
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Pagination Dots */}
