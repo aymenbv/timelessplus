@@ -222,7 +222,8 @@ const ProductDetails = () => {
   if (isLoading) {
     return <div className="min-h-screen bg-background">
         <Header />
-        <main className="container mx-auto px-4 py-8">
+        <div className="h-20" />
+        <main className="container mx-auto px-4 py-4 md:py-8">
           <div className="grid lg:grid-cols-2 gap-12">
             <div className="space-y-4">
               <Skeleton className="aspect-square w-full rounded-lg" />
@@ -248,7 +249,8 @@ const ProductDetails = () => {
   if (error || !product) {
     return <div className="min-h-screen bg-background">
         <Header />
-        <main className="container mx-auto px-4 py-16 text-center">
+        <div className="h-20" />
+        <main className="container mx-auto px-4 py-8 md:py-16 text-center">
           <h1 className="text-2xl font-display mb-4">المنتج غير موجود</h1>
           <Link to="/products" className="btn-luxury">
             العودة للمنتجات
@@ -260,14 +262,17 @@ const ProductDetails = () => {
   return <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
-        {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-          <Link to="/" className="hover:text-primary transition-colors">الرئيسية</Link>
-          <ChevronRight className="w-4 h-4" />
-          <Link to="/products" className="hover:text-primary transition-colors">الساعات</Link>
-          <ChevronRight className="w-4 h-4" />
-          <span className="text-foreground">{product.name}</span>
+      {/* Spacer for fixed header */}
+      <div className="h-20" />
+      
+      <main className="container mx-auto px-4 py-4 md:py-8">
+        {/* Breadcrumbs - Mobile optimized */}
+        <nav className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-muted-foreground mb-4 md:mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <Link to="/" className="hover:text-primary transition-colors shrink-0">الرئيسية</Link>
+          <ChevronRight className="w-3 h-3 md:w-4 md:h-4 shrink-0 opacity-60" />
+          <Link to="/products" className="hover:text-primary transition-colors shrink-0">الساعات</Link>
+          <ChevronRight className="w-3 h-3 md:w-4 md:h-4 shrink-0 opacity-60" />
+          <span className="text-foreground/80 truncate max-w-[150px] md:max-w-none">{product.name}</span>
         </nav>
 
         <div className="grid lg:grid-cols-2 gap-12">
