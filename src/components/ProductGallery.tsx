@@ -85,7 +85,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
             <div
               key={index}
               ref={(el) => (slideRefs.current[index] = el)}
-              className="flex-shrink-0 w-full snap-center aspect-[3/4] max-h-[60vh] bg-secondary rounded-lg overflow-hidden"
+              className="flex-shrink-0 w-full snap-center snap-always aspect-[3/4] max-h-[60vh] bg-secondary rounded-lg overflow-hidden"
             >
               {isVideoUrl(img) ? (
                 <video
