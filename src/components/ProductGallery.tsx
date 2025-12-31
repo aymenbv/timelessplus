@@ -100,7 +100,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
             {images.map((img, index) => (
               <div
                 key={index}
-                className="flex-shrink-0 w-full min-w-full aspect-[3/4] max-h-[60vh] bg-secondary transform-gpu [backface-visibility:hidden]"
+                className="flex-shrink-0 w-full min-w-full basis-full aspect-[4/5] max-h-[60vh] bg-secondary transform-gpu [backface-visibility:hidden]"
                 style={{ flex: '0 0 100%' }}
               >
                 {isVideoUrl(img) ? (
@@ -151,7 +151,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
                           src={img}
                           alt={`${productName} - ${index + 1}`}
                           className="w-full h-full object-cover transform-gpu [backface-visibility:hidden]"
-                          loading={index < 3 ? 'eager' : 'lazy'}
+                          loading="eager"
                           decoding="async"
                           draggable={false}
                           onDoubleClick={() => {
