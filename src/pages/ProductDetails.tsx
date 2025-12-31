@@ -18,9 +18,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { isVideoUrl } from '@/lib/mediaUtils';
 import ColorSelector from '@/components/ColorSelector';
+import ProductGallery from '@/components/ProductGallery';
 const ProductDetails = () => {
   const {
     id
@@ -38,20 +37,10 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedColor, setSelectedColor] = useState<string>('');
-  const [selectedImage, setSelectedImage] = useState(0);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [reviewName, setReviewName] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
-  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
-  const [isZooming, setIsZooming] = useState(false);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setZoomPosition({ x, y });
-  };
 
   // Fetch reviews from database
   const {
@@ -291,50 +280,12 @@ const ProductDetails = () => {
           x: 0
         }} transition={{
           duration: 0.5
-        }} className="space-y-4">
-            {/* Main Image/Video */}
-            <div 
-              className="aspect-square overflow-hidden rounded-lg bg-secondary cursor-crosshair relative"
-              onMouseMove={!isVideoUrl(allImages[selectedImage]) ? handleMouseMove : undefined}
-              onMouseEnter={() => !isVideoUrl(allImages[selectedImage]) && setIsZooming(true)}
-              onMouseLeave={() => setIsZooming(false)}
-            >
-              {isVideoUrl(allImages[selectedImage] || product.image) ? (
-                <video 
-                  src={allImages[selectedImage] || product.image} 
-                  className="w-full h-full object-cover"
-                  controls
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                />
-              ) : (
-                <img 
-                  src={allImages[selectedImage] || product.image} 
-                  alt={product.name} 
-                  className="w-full h-full object-cover transition-transform duration-150 ease-out"
-                  style={{
-                    transform: isZooming ? 'scale(2.5)' : 'scale(1)',
-                    transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
-                  }}
-                />
-              )}
-            </div>
-            
-            {/* Thumbnails - Horizontal Scrollable */}
-            {allImages.length > 1 && <ScrollArea className="w-full whitespace-nowrap">
-                <div className="flex gap-3 pb-2">
-                  {allImages.map((img, index) => <button key={index} onClick={() => setSelectedImage(index)} className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === index ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-muted-foreground'}`}>
-                      {isVideoUrl(img) ? (
-                        <video src={img} className="w-full h-full object-cover" muted />
-                      ) : (
-                        <img src={img} alt={`${product.name} - ${index + 1}`} className="w-full h-full object-cover" />
-                      )}
-                    </button>)}
-                </div>
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>}
+        }}>
+            <ProductGallery 
+              images={allImages} 
+              productName={product.name} 
+              key={selectedColor || 'default'}
+            />
           </motion.div>
 
           {/* Right Column - Product Info */}
@@ -380,7 +331,6 @@ const ProductDetails = () => {
                   selectedColor={selectedColor}
                   onColorSelect={(color) => {
                     setSelectedColor(color);
-                    setSelectedImage(0); // Reset to first image when color changes
                   }}
                   size="lg"
                 />
