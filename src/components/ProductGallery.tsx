@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { isVideoUrl } from '@/lib/mediaUtils';
 
 interface ProductGalleryProps {
@@ -10,14 +10,39 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const [isZooming, setIsZooming] = useState(false);
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const isNavigatingRef = useRef(false);
 
   // Reset selected image when images array changes
   useEffect(() => {
     setSelectedImage(0);
-    if (carouselRef.current) {
-      carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-    }
+  }, [images]);
+
+  // IntersectionObserver to detect which slide is visible
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    
+    slideRefs.current.forEach((slide, index) => {
+      if (!slide) return;
+      
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.intersectionRatio > 0.5 && !isNavigatingRef.current) {
+              setSelectedImage(index);
+            }
+          });
+        },
+        { threshold: 0.5 }
+      );
+      
+      observer.observe(slide);
+      observers.push(observer);
+    });
+
+    return () => {
+      observers.forEach((observer) => observer.disconnect());
+    };
   }, [images]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -27,33 +52,22 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
     setZoomPosition({ x, y });
   };
 
-  const isScrollingRef = useRef(false);
-
-  // Handle scroll snap to update active dot
-  const handleScroll = () => {
-    if (!carouselRef.current || isScrollingRef.current) return;
-    const scrollLeft = carouselRef.current.scrollLeft;
-    const itemWidth = carouselRef.current.offsetWidth;
-    const newIndex = Math.round(scrollLeft / itemWidth);
-    if (newIndex !== selectedImage && newIndex >= 0 && newIndex < images.length) {
-      setSelectedImage(newIndex);
-    }
-  };
-
-  // Scroll to image on dot/thumbnail click
-  const scrollToImage = (index: number) => {
+  // Scroll to image on dot click using scrollIntoView (RTL-safe)
+  const scrollToImage = useCallback((index: number) => {
     if (index === selectedImage) return;
-    isScrollingRef.current = true;
+    
+    isNavigatingRef.current = true;
     setSelectedImage(index);
-    if (carouselRef.current) {
-      const itemWidth = carouselRef.current.offsetWidth;
-      carouselRef.current.scrollTo({ left: index * itemWidth, behavior: 'smooth' });
-      // Reset flag after scroll animation
+    
+    const slide = slideRefs.current[index];
+    if (slide) {
+      slide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      // Reset navigation flag after animation
       setTimeout(() => {
-        isScrollingRef.current = false;
+        isNavigatingRef.current = false;
       }, 400);
     }
-  };
+  }, [selectedImage]);
 
   const currentImage = images[selectedImage] || images[0];
   const isVideo = isVideoUrl(currentImage);
@@ -63,14 +77,14 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
       {/* Mobile: Swipe Carousel */}
       <div className="md:hidden">
         <div
-          ref={carouselRef}
-          onScroll={handleScroll}
-          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide max-h-[60vh]"
+          dir="ltr"
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide max-h-[60vh] touch-pan-x overscroll-x-contain"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {images.map((img, index) => (
             <div
               key={index}
+              ref={(el) => (slideRefs.current[index] = el)}
               className="flex-shrink-0 w-full snap-center aspect-[3/4] max-h-[60vh] bg-secondary rounded-lg overflow-hidden"
             >
               {isVideoUrl(img) ? (
@@ -89,6 +103,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
                   alt={`${productName} - ${index + 1}`}
                   className="w-full h-full object-cover"
                   loading={index === 0 ? 'eager' : 'lazy'}
+                  draggable={false}
                 />
               )}
             </div>
