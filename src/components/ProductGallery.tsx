@@ -1,5 +1,7 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { isVideoUrl } from '@/lib/mediaUtils';
+import useEmblaCarousel from 'embla-carousel-react';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 
 interface ProductGalleryProps {
   images: string[];
@@ -10,40 +12,57 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const [isZooming, setIsZooming] = useState(false);
-  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const isNavigatingRef = useRef(false);
+  const [isZoomedIn, setIsZoomedIn] = useState(false);
+
+  // Embla Carousel with infinite loop
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    dragFree: false,
+    containScroll: false,
+    watchDrag: !isZoomedIn, // Disable drag when zoomed in
+  });
 
   // Reset selected image when images array changes
   useEffect(() => {
     setSelectedImage(0);
-  }, [images]);
+    if (emblaApi) {
+      emblaApi.scrollTo(0, true);
+    }
+  }, [images, emblaApi]);
 
-  // IntersectionObserver to detect which slide is visible
+  // Re-init embla when zoom state changes to enable/disable dragging
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    
-    slideRefs.current.forEach((slide, index) => {
-      if (!slide) return;
-      
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && entry.intersectionRatio > 0.5 && !isNavigatingRef.current) {
-              setSelectedImage(index);
-            }
-          });
-        },
-        { threshold: 0.5 }
-      );
-      
-      observer.observe(slide);
-      observers.push(observer);
-    });
+    if (emblaApi) {
+      emblaApi.reInit({
+        loop: true,
+        dragFree: false,
+        containScroll: false,
+        watchDrag: !isZoomedIn,
+      });
+    }
+  }, [isZoomedIn, emblaApi]);
 
+  // Sync selected index with embla
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedImage(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on('select', onSelect);
+    onSelect();
     return () => {
-      observers.forEach((observer) => observer.disconnect());
+      emblaApi.off('select', onSelect);
     };
-  }, [images]);
+  }, [emblaApi, onSelect]);
+
+  // Scroll to specific slide
+  const scrollToSlide = useCallback((index: number) => {
+    if (emblaApi) {
+      emblaApi.scrollTo(index);
+    }
+  }, [emblaApi]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -52,62 +71,79 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
     setZoomPosition({ x, y });
   };
 
-  // Scroll to image on dot click using scrollIntoView (RTL-safe)
-  const scrollToImage = useCallback((index: number) => {
-    if (index === selectedImage) return;
-    
-    isNavigatingRef.current = true;
-    setSelectedImage(index);
-    
-    const slide = slideRefs.current[index];
-    if (slide) {
-      slide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      // Reset navigation flag after animation
-      setTimeout(() => {
-        isNavigatingRef.current = false;
-      }, 400);
-    }
-  }, [selectedImage]);
-
   const currentImage = images[selectedImage] || images[0];
   const isVideo = isVideoUrl(currentImage);
 
   return (
     <div className="space-y-3">
-      {/* Mobile: Swipe Carousel */}
+      {/* Mobile: Embla Carousel with Pinch-to-Zoom */}
       <div className="md:hidden">
-        <div
-          dir="ltr"
-          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide max-h-[60vh] touch-pan-x overscroll-x-contain"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {images.map((img, index) => (
-            <div
-              key={index}
-              ref={(el) => (slideRefs.current[index] = el)}
-              className="flex-shrink-0 w-full snap-center snap-always aspect-[3/4] max-h-[60vh] bg-secondary rounded-lg overflow-hidden"
-            >
-              {isVideoUrl(img) ? (
-                <video
-                  src={img}
-                  className="w-full h-full object-cover"
-                  controls
-                  autoPlay={index === selectedImage}
-                  muted
-                  loop
-                  playsInline
-                />
-              ) : (
-                <img
-                  src={img}
-                  alt={`${productName} - ${index + 1}`}
-                  className="w-full h-full object-cover"
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  draggable={false}
-                />
-              )}
-            </div>
-          ))}
+        <div className="overflow-hidden rounded-lg" ref={emblaRef}>
+          <div className="flex">
+            {images.map((img, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 w-full aspect-[3/4] max-h-[60vh] bg-secondary"
+              >
+                {isVideoUrl(img) ? (
+                  <video
+                    src={img}
+                    className="w-full h-full object-cover"
+                    controls
+                    autoPlay={index === selectedImage}
+                    muted
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <TransformWrapper
+                    initialScale={1}
+                    minScale={1}
+                    maxScale={4}
+                    centerOnInit
+                    onZoomStart={() => setIsZoomedIn(true)}
+                    onZoomStop={(ref) => {
+                      if (ref.state.scale <= 1.1) {
+                        setIsZoomedIn(false);
+                      }
+                    }}
+                    onPanning={() => setIsZoomedIn(true)}
+                    onTransformed={(_, state) => {
+                      if (state.scale <= 1.1) {
+                        setIsZoomedIn(false);
+                      } else {
+                        setIsZoomedIn(true);
+                      }
+                    }}
+                    panning={{ disabled: false }}
+                    pinch={{ disabled: false }}
+                    doubleClick={{ mode: 'toggle' }}
+                  >
+                    {({ resetTransform }) => (
+                      <TransformComponent
+                        wrapperStyle={{ width: '100%', height: '100%' }}
+                        contentStyle={{ width: '100%', height: '100%' }}
+                      >
+                        <img
+                          src={img}
+                          alt={`${productName} - ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          loading={index === 0 ? 'eager' : 'lazy'}
+                          draggable={false}
+                          onDoubleClick={() => {
+                            if (isZoomedIn) {
+                              resetTransform();
+                              setIsZoomedIn(false);
+                            }
+                          }}
+                        />
+                      </TransformComponent>
+                    )}
+                  </TransformWrapper>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Pagination Dots */}
@@ -116,7 +152,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
             {images.map((_, index) => (
               <button
                 key={index}
-                onClick={() => scrollToImage(index)}
+                onClick={() => scrollToSlide(index)}
                 className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
                   index === selectedImage
                     ? 'bg-[#D4AF37] scale-110'
@@ -126,6 +162,13 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
               />
             ))}
           </div>
+        )}
+
+        {/* Zoom hint */}
+        {!isZoomedIn && images.length > 0 && !isVideoUrl(images[0]) && (
+          <p className="text-center text-xs text-muted-foreground mt-2">
+            Pinch to zoom • Double-tap to toggle zoom
+          </p>
         )}
       </div>
 
