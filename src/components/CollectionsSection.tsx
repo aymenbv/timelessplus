@@ -24,7 +24,7 @@ const CollectionsSection = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-background/90 to-transparent" />
             <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-center">
-              <h3 className="font-display text-2xl md:text-3xl text-foreground">Luxury Collection</h3>
+              <h2 className="font-display text-2xl md:text-3xl text-foreground">Luxury Collection</h2>
               <p className="text-muted-foreground mt-2 text-sm md:text-base">Timeless Craftsmanship</p>
               <Link
                 to="/products?category=men"
@@ -50,7 +50,7 @@ const CollectionsSection = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-background/90 to-transparent" />
             <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-center">
-              <h3 className="font-display text-2xl md:text-3xl text-foreground">Smart Tech</h3>
+              <h2 className="font-display text-2xl md:text-3xl text-foreground">Smart Tech</h2>
               <p className="text-muted-foreground mt-2 text-sm md:text-base">Future of Innovation</p>
               <Link
                 to="/products?category=smart"
