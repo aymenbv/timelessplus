@@ -31,13 +31,15 @@ const Seo = ({
   noIndex = false,
   product
 }: SeoProps) => {
+  // Build full canonical URL - always use siteUrl as base
   const fullCanonical = canonical 
     ? (canonical.startsWith("http") ? canonical : `${seoConfig.siteUrl}${canonical}`)
     : seoConfig.siteUrl;
   
+  // Build full OG image URL - always use siteUrl as base
   const fullOgImage = ogImage.startsWith("http") 
     ? ogImage 
-    : `${seoConfig.siteUrl}${ogImage}`;
+    : `${seoConfig.siteUrl}${ogImage.startsWith('/') ? ogImage : '/' + ogImage}`;
 
   // Organization JSON-LD
   const organizationSchema = {
