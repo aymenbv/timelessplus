@@ -202,7 +202,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
 
         {/* Pagination Dots */}
         {images.length > 1 && (
-          <div className="flex justify-center gap-2 mt-3">
+          <div dir="ltr" className="flex justify-center gap-2 mt-3">
             {images.map((_, index) => (
               <button
                 key={index}
