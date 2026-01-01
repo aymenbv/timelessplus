@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /admin/dashboard
 
-Sitemap: https://poebjmtaqmxotwwblkai.supabase.co/functions/v1/sitemap
+Sitemap: https://timelessplus.lovable.app/sitemap.xml
