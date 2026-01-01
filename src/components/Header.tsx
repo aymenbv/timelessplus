@@ -147,23 +147,25 @@ const Header = () => {
             <button 
               onClick={() => setSearchOpen(!searchOpen)}
               className="p-2 hover:text-primary transition-colors"
+              aria-label={searchOpen ? "إغلاق البحث" : "فتح البحث"}
             >
               <Search className="w-5 h-5" />
             </button>
-            <Link to="/cart" className="p-2 hover:text-primary transition-colors relative">
+            <Link to="/cart" className="p-2 hover:text-primary transition-colors relative" aria-label={`سلة التسوق${itemCount > 0 ? ` - ${itemCount} منتجات` : ''}`}>
               <ShoppingCart className="w-5 h-5" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center" aria-hidden="true">
                   {itemCount}
                 </span>
               )}
             </Link>
-            <Link to="/admin" className="p-2 hover:text-primary transition-colors">
+            <Link to="/admin" className="p-2 hover:text-primary transition-colors" aria-label="تسجيل دخول المشرف">
               <User className="w-5 h-5" />
             </Link>
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="p-2 md:hidden hover:text-primary transition-colors"
+              aria-label="فتح القائمة"
             >
               <Menu className="w-6 h-6" />
             </button>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Facebook } from 'lucide-react';
+
 const Footer = () => {
   return (
     <footer className="bg-card border-t border-border/50 py-8 md:py-12">
@@ -8,12 +9,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 gap-6 md:gap-8">
           {/* Logo & Social Links */}
           <div className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
-            <img src="/logo.png" alt="Timeless" className="h-10 w-auto object-contain" />
+            <Link to="/" aria-label="الصفحة الرئيسية - Timeless">
+              <img src="/logo.png" alt="Timeless" width={120} height={40} className="h-10 w-auto object-contain" />
+            </Link>
             <div className="flex items-center gap-4">
-              <a href="#" className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center hover:text-primary transition-colors">
+              <a href="#" className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center hover:text-primary transition-colors" aria-label="تابعنا على إنستغرام">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="#" className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center hover:text-primary transition-colors">
+              <a href="#" className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center hover:text-primary transition-colors" aria-label="تابعنا على فيسبوك">
                 <Facebook className="w-5 h-5" />
               </a>
             </div>
