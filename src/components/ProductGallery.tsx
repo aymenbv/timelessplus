@@ -247,6 +247,8 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
                 transform: isZooming ? 'scale(2.5)' : 'scale(1)',
                 transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
               }}
+              loading="eager"
+              fetchPriority="high"
             />
           )}
         </div>

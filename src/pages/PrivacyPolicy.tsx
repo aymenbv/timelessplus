@@ -1,10 +1,17 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
+import Seo from '@/components/Seo';
+import { seoConfig } from '@/config/seo';
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Seo 
+        title={seoConfig.pages.privacyPolicy.title}
+        description={seoConfig.pages.privacyPolicy.description}
+        canonical="/privacy-policy"
+      />
       <Header />
       
       <main className="pt-24 pb-16">
