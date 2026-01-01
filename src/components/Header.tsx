@@ -95,6 +95,8 @@ const Header = () => {
             <img 
               src="/logo.png" 
               alt="Timeless" 
+              width={160}
+              height={56}
               className="h-12 md:h-14 w-auto object-contain"
             />
           </Link>
