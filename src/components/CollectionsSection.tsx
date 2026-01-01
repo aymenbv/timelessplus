@@ -21,6 +21,7 @@ const CollectionsSection = () => {
               src={watchClassic}
               alt="Luxury Collection"
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-background/90 to-transparent" />
             <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-center">
@@ -47,6 +48,7 @@ const CollectionsSection = () => {
               src={watchSmart}
               alt="Smart Tech"
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-background/90 to-transparent" />
             <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-center">
