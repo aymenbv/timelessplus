@@ -2,7 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/dashboard
-Disallow: /cart
-Disallow: /order-success
 
-Sitemap: https://timelessplus.lovable.app/sitemap.xml
+Sitemap: https://poebjmtaqmxotwwblkai.supabase.co/functions/v1/sitemap
