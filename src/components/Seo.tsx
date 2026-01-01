@@ -73,7 +73,7 @@ const Seo = ({
     }
   };
 
-  // Product JSON-LD
+  // Product JSON-LD - Enhanced with full schema.org specs
   const productSchema = product ? {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -84,18 +84,22 @@ const Seo = ({
     },
     description: product.description || description,
     image: product.image ? (product.image.startsWith("http") ? product.image : `${seoConfig.siteUrl}${product.image}`) : fullOgImage,
-    sku: product.sku || product.name.replace(/\s+/g, "-").toLowerCase(),
+    sku: product.sku || `TP-${product.name.replace(/\s+/g, "-").toUpperCase().slice(0, 20)}`,
+    mpn: product.sku || `TP-${product.name.replace(/\s+/g, "-").toUpperCase().slice(0, 20)}`,
     offers: {
       "@type": "Offer",
       url: product.url || fullCanonical,
       priceCurrency: product.currency || seoConfig.businessInfo.currency,
       price: product.price,
+      priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
       availability: product.inStock !== false 
         ? "https://schema.org/InStock" 
         : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
       seller: {
         "@type": "Organization",
-        name: seoConfig.businessInfo.name
+        name: seoConfig.businessInfo.name,
+        url: seoConfig.siteUrl
       }
     }
   } : null;

@@ -285,7 +285,9 @@ const ProductDetails = () => {
             brand: product!.brand,
             description: product!.description || undefined,
             price: product!.price,
+            currency: "DZD",
             image: product!.image,
+            sku: `TP-${product!.id.slice(0, 8).toUpperCase()}`,
             inStock: product!.inStock,
             url: productSeo.canonical
           }}
