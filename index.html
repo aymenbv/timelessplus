@@ -37,6 +37,13 @@
     <meta name="apple-mobile-web-app-title" content="TimelessPlus" />
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />
     <link rel="mask-icon" href="/pwa-512x512.png" color="#D4AF37" />
+    
+    <!-- Preload LCP Hero Poster for faster render -->
+    <link rel="preload" as="image" href="/hero-poster.webp" fetchpriority="high" />
+    
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
 
   <body>

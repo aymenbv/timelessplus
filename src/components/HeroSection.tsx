@@ -8,15 +8,19 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
-      {/* Video Background */}
+      {/* Video Background with Poster for LCP optimization */}
       <div className="absolute inset-0 z-0">
         <video
           autoPlay
           muted
           loop
           playsInline
+          preload="auto"
+          poster="/hero-poster.webp"
           className="w-full h-full object-cover"
         >
+          {/* WebM for better compression, MP4 as fallback */}
+          <source src="/hero-video.webm" type="video/webm" />
           <source src={heroVideoSrc} type="video/mp4" />
         </video>
         {/* Dark overlay for better text readability */}
