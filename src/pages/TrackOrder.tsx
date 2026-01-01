@@ -5,6 +5,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Seo from '@/components/Seo';
+import { seoConfig } from '@/config/seo';
 
 interface TrackingStep {
   id: number;
@@ -95,6 +97,12 @@ const TrackOrder = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
+      <Seo 
+        title={seoConfig.pages.trackOrder.title}
+        description={seoConfig.pages.trackOrder.description}
+        canonical="/track-order"
+        noIndex={true}
+      />
       <Header />
       
       <main className="flex-1 py-12">

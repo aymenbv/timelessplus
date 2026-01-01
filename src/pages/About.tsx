@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import { User } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Seo from '@/components/Seo';
+import { seoConfig } from '@/config/seo';
 
 const teamMembers = [
   { name: 'قرباتي محمد', role: 'Co-Founder' },
@@ -13,6 +15,11 @@ const teamMembers = [
 const About = () => {
   return (
     <div className="min-h-screen bg-background relative">
+      <Seo 
+        title={seoConfig.pages.about.title}
+        description={seoConfig.pages.about.description}
+        canonical="/about"
+      />
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video

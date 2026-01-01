@@ -6,6 +6,8 @@ import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/hooks/useProducts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Loader2, SlidersHorizontal, X } from 'lucide-react';
+import Seo from '@/components/Seo';
+import { seoConfig, getCategorySeo } from '@/config/seo';
 
 const Products = () => {
   const [searchParams] = useSearchParams();
@@ -159,8 +161,18 @@ const Products = () => {
     </>
   );
 
+  // Get SEO based on category
+  const categorySeo = categoryFilter 
+    ? getCategorySeo(categoryFilter) 
+    : seoConfig.pages.products;
+
   return (
     <div className="min-h-screen bg-background">
+      <Seo 
+        title={categorySeo.title}
+        description={categorySeo.description}
+        canonical={categoryFilter ? `/products?category=${categoryFilter}` : '/products'}
+      />
       <Header />
 
       <main className="pt-24 pb-20">
