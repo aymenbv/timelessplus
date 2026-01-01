@@ -9,6 +9,8 @@ import { Trash2, Plus, Minus, Truck, CreditCard, ShieldCheck, Loader2, Tag, Chec
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import Seo from '@/components/Seo';
+import { seoConfig } from '@/config/seo';
 
 const VALID_PROMO_CODE = 'TIMELESS2025';
 const PROMO_DISCOUNT = 0.10; // 10%
@@ -182,6 +184,12 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo 
+        title={seoConfig.pages.cart.title}
+        description={seoConfig.pages.cart.description}
+        canonical="/cart"
+        noIndex={true}
+      />
       <Header />
 
       <main className="pt-24 pb-20">

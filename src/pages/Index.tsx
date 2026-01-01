@@ -7,6 +7,8 @@ import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/hooks/useProducts';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
+import Seo from '@/components/Seo';
+import { seoConfig } from '@/config/seo';
 
 type TabFilter = 'all' | 'men' | 'women' | 'new';
 
@@ -44,6 +46,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      <Seo 
+        title={seoConfig.pages.home.title}
+        description={seoConfig.pages.home.description}
+        canonical="/"
+      />
       <Header />
       
       <main className="overflow-x-hidden">

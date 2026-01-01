@@ -1,3 +1,6 @@
+# Robots.txt for Timeless Watch Store
+# https://timelessplus.lovable.app
+
 User-agent: Googlebot
 Allow: /
 
@@ -12,3 +15,9 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/dashboard
+Disallow: /cart
+Disallow: /order-success
+
+Sitemap: https://timelessplus.lovable.app/sitemap.xml

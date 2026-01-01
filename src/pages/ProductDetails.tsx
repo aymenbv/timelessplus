@@ -20,6 +20,9 @@ import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import ColorSelector from '@/components/ColorSelector';
 import ProductGallery from '@/components/ProductGallery';
+import Seo from '@/components/Seo';
+import { seoConfig, getProductSeo } from '@/config/seo';
+
 const ProductDetails = () => {
   const {
     id
@@ -259,7 +262,35 @@ const ProductDetails = () => {
         <Footer />
       </div>;
   }
+  // Generate product SEO
+  const productSeo = product ? getProductSeo({
+    name: product.name,
+    brand: product.brand,
+    description: product.description,
+    price: product.price,
+    image: product.image,
+    id: product.id
+  }) : null;
+
   return <div className="min-h-screen bg-background">
+      {productSeo && (
+        <Seo 
+          title={productSeo.title}
+          description={productSeo.description}
+          canonical={productSeo.canonical}
+          ogImage={productSeo.ogImage}
+          ogType="product"
+          product={{
+            name: product!.name,
+            brand: product!.brand,
+            description: product!.description || undefined,
+            price: product!.price,
+            image: product!.image,
+            inStock: product!.inStock,
+            url: productSeo.canonical
+          }}
+        />
+      )}
       <Header />
       
       {/* Spacer for fixed header */}

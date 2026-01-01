@@ -3,12 +3,19 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Phone, MapPin, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Seo from '@/components/Seo';
+import { seoConfig } from '@/config/seo';
 
 const Contact = () => {
   const whatsappUrl = "https://api.whatsapp.com/send?phone=%2B213562341417";
 
   return (
     <div className="min-h-screen bg-background relative">
+      <Seo 
+        title={seoConfig.pages.contact.title}
+        description={seoConfig.pages.contact.description}
+        canonical="/contact"
+      />
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video
