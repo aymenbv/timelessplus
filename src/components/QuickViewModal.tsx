@@ -111,6 +111,7 @@ const QuickViewModal = ({
                     animate="center"
                     exit="exit"
                     transition={{ duration: 0.3, ease: "easeInOut" }}
+                    loading="lazy"
                     drag={allImages.length > 1 ? "x" : false}
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={0.2}
