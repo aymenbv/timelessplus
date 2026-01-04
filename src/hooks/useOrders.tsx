@@ -95,9 +95,13 @@ export const useCreateOrder = () => {
       items: CartItem[];
       referralCode?: string;
     }) => {
-      const { data: order, error: orderError } = await supabase
+      // Generate order ID on frontend to avoid needing SELECT after INSERT
+      const orderId = crypto.randomUUID();
+
+      const { error: orderError } = await supabase
         .from('orders')
         .insert({
+          id: orderId,
           customer_name: customerName,
           phone,
           wilaya,
@@ -106,15 +110,17 @@ export const useCreateOrder = () => {
           total,
           status: 'pending',
           referral_code: referralCode || null,
-        })
-        .select()
-        .single();
+        });
 
       if (orderError) throw orderError;
 
+      // Helper to check if string is valid UUID
+      const isValidUUID = (str: string) =>
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
       const orderItems = items.map((item) => ({
-        order_id: order.id,
-        product_id: item.product.id,
+        order_id: orderId,
+        product_id: isValidUUID(item.product.id) ? item.product.id : null,
         product_name: item.product.name,
         product_price: item.product.price,
         quantity: item.quantity,
@@ -127,7 +133,7 @@ export const useCreateOrder = () => {
 
       if (itemsError) throw itemsError;
 
-      return order;
+      return { id: orderId };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
