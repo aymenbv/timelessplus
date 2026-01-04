@@ -50,7 +50,7 @@ const orderSchema = z.object({
   phone: z.string().trim().regex(/^\+?213[0-9]{9}$/, 'رقم الهاتف غير صالح'),
   wilaya: z.string().trim().min(1, 'اختر الولاية'),
   commune: z.string().trim().min(2, 'البلدية مطلوبة').max(100),
-  referralCode: z.string().trim().max(50).optional(),
+  
 });
 
 const Cart = () => {
@@ -69,7 +69,7 @@ const Cart = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
-  const [referralCode, setReferralCode] = useState('');
+  
   const [promoError, setPromoError] = useState('');
 
   const discount = promoApplied ? total * PROMO_DISCOUNT : 0;
@@ -110,7 +110,7 @@ const Cart = () => {
   };
 
   const handleSubmitOrder = async () => {
-    const validation = orderSchema.safeParse({ customerName, phone, wilaya, commune, referralCode: referralCode || undefined });
+    const validation = orderSchema.safeParse({ customerName, phone, wilaya, commune });
     
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {};
@@ -134,7 +134,7 @@ const Cart = () => {
         paymentMethod,
         total: finalTotal,
         items,
-        referralCode: referralCode.trim() || undefined,
+        
       });
       
       // Prepare order data for success page
@@ -323,19 +323,6 @@ const Cart = () => {
                       )}
                     </div>
 
-                    {/* Referral Code Field */}
-                    <div>
-                      <label className="block text-sm mb-2">كود الإحالة (اختياري)</label>
-                      <input
-                        type="text"
-                        value={referralCode}
-                        onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                        placeholder="أدخل كود الإحالة إن وجد"
-                        className="w-full bg-background border border-border rounded-lg px-4 py-3 focus:outline-none focus:border-primary"
-                        dir="ltr"
-                        maxLength={50}
-                      />
-                    </div>
 
                     <div className="grid grid-cols-2 gap-4 pt-4">
                       <button
