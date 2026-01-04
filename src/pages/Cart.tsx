@@ -162,8 +162,9 @@ const Cart = () => {
       
       // Navigate to success page with order data
       navigate('/order-success', { state: orderData });
-    } catch {
-      toast.error('فشل إنشاء الطلب');
+    } catch (err) {
+      console.error('Order creation failed:', err);
+      toast.error('تعذر إرسال الطلب، حاول مرة أخرى');
     }
   };
 
